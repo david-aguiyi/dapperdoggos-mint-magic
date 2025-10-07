@@ -97,6 +97,10 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.4)" },
           "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.8)" },
         },
+        "scroll": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-33.333%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -105,6 +109,7 @@ export default {
         "wiggle": "wiggle 0.5s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "scroll": "scroll 30s linear infinite",
       },
     },
   },

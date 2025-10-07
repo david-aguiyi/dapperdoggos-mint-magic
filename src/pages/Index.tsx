@@ -4,6 +4,7 @@ import { Wallet, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { MintSuccessDialog } from "@/components/MintSuccessDialog";
 import { useConfetti } from "@/hooks/useConfetti";
+import { DogTicker } from "@/components/DogTicker";
 import dogNft from "@/assets/dapper-dog-nft.jpg";
 
 const Index = () => {
@@ -22,13 +23,12 @@ const Index = () => {
         if (prev >= 1000) return 1000;
         return prev + Math.floor(Math.random() * 3);
       });
-    }, 15000); // Update every 15 seconds
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
 
   const connectWallet = async () => {
-    // Simulate wallet connection
     const mockAddress = "0x" + Math.random().toString(16).substr(2, 40);
     setWalletAddress(mockAddress);
     setIsWalletConnected(true);
@@ -41,7 +41,6 @@ const Index = () => {
   const mintNFT = async () => {
     setIsMinting(true);
     
-    // Simulate minting transaction
     setTimeout(() => {
       const mockTxHash = "0x" + Math.random().toString(16).substr(2, 64);
       setTxHash(mockTxHash);
@@ -60,69 +59,72 @@ const Index = () => {
   const progress = (mintedCount / 1000) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center p-4 overflow-hidden relative">
-      {/* Decorative background elements */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-20 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
-      
-      <div className="relative z-10 max-w-2xl w-full">
-        {/* Header */}
-        <div className="text-center mb-8 space-y-2">
-          <h1 className="font-luckiest text-6xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-bounce-in">
-            DapperDoggos
-          </h1>
-          <p className="font-fredoka text-xl text-muted-foreground">
-            Adopt your unique digital pup! 🐕
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-purple-50 flex flex-col overflow-hidden">
+      {/* Header */}
+      <header className="flex justify-between items-center px-8 py-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-luckiest text-white text-xl">
+            DD
+          </div>
+          <h2 className="font-luckiest text-2xl text-foreground">DapperDoggos</h2>
+        </div>
+
+        <nav className="hidden md:flex gap-8 font-fredoka font-semibold text-foreground/70">
+          <a href="#" className="hover:text-foreground transition-colors">Home</a>
+          <a href="#" className="hover:text-foreground transition-colors">Mint</a>
+          <a href="#" className="hover:text-foreground transition-colors">Gallery</a>
+          <a href="#" className="hover:text-foreground transition-colors">Rarity</a>
+        </nav>
+
+        {!isWalletConnected ? (
+          <Button variant="hero" onClick={connectWallet}>
+            <Wallet className="mr-2 h-5 w-5" />
+            Connect Wallet
+          </Button>
+        ) : (
+          <div className="bg-card border-2 border-primary/20 rounded-full px-5 py-3 flex items-center gap-2">
+            <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
+            <span className="font-fredoka font-semibold text-sm text-foreground">
+              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </span>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 -mt-8">
+        {/* Minting Live Badge */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 mb-6 border-2 border-primary/20 shadow-lg">
+          <p className="font-fredoka font-semibold text-primary flex items-center gap-2">
+            <Sparkles className="h-4 w-4 animate-pulse" />
+            Minting Now Live
           </p>
         </div>
 
-        {/* Main Card */}
-        <div className="bg-card rounded-[2.5rem] shadow-[var(--shadow-playful)] p-8 space-y-6 border-4 border-primary/20">
-          {/* Wallet Connection */}
-          <div className="flex justify-between items-center">
-            {!isWalletConnected ? (
-              <Button 
-                variant="outline" 
-                onClick={connectWallet}
-                className="flex-1"
-              >
-                <Wallet className="mr-2 h-5 w-5" />
-                Connect Wallet
-              </Button>
-            ) : (
-              <div className="flex-1 bg-muted/50 rounded-full px-5 py-3 flex items-center gap-2">
-                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <span className="font-fredoka font-semibold text-sm text-foreground">
-                  {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Title */}
+        <div className="text-center mb-8 max-w-4xl">
+          <h1 className="font-luckiest text-6xl md:text-7xl mb-4">
+            <span className="text-foreground">Mint Your</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
+              DapperDoggo
+            </span>
+          </h1>
+          <p className="font-fredoka text-lg text-foreground/70 max-w-2xl mx-auto">
+            Join the revolution of digital collectibles. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.
+          </p>
+        </div>
 
-          {/* NFT Display */}
-          <div className="relative group">
-            <div className="absolute -inset-2 bg-gradient-to-r from-primary via-secondary to-accent rounded-[2rem] opacity-75 group-hover:opacity-100 blur transition duration-500 animate-pulse-glow" />
-            <div className="relative bg-card rounded-3xl p-4 shadow-2xl">
-              <img 
-                src={dogNft} 
-                alt="DapperDoggo NFT" 
-                className="w-full h-auto rounded-2xl animate-float"
-              />
-            </div>
-          </div>
-
-          {/* Mint Counter */}
+        {/* Mint Counter & Button */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-xl w-full space-y-6 border-2 border-primary/10 mb-6">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="font-fredoka font-bold text-3xl text-foreground">
-                <span className="text-primary animate-pulse">{mintedCount}</span> / 1000
-              </span>
-              <span className="font-fredoka text-sm text-muted-foreground">
-                Minted
+              <span className="font-fredoka text-sm text-foreground/60">Minted</span>
+              <span className="font-fredoka font-bold text-2xl text-foreground">
+                <span className="text-primary">{mintedCount}</span> / 1000
               </span>
             </div>
-            <div className="relative h-4 bg-muted rounded-full overflow-hidden">
+            <div className="relative h-3 bg-muted/30 rounded-full overflow-hidden">
               <div 
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
@@ -130,11 +132,10 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Mint Button */}
           <Button 
             variant="hero" 
             size="lg"
-            className="w-full"
+            className="w-full text-xl py-6"
             disabled={!isWalletConnected || isMinting || mintedCount >= 1000}
             onClick={mintNFT}
           >
@@ -142,41 +143,20 @@ const Index = () => {
               "Connect Wallet to Mint"
             ) : isMinting ? (
               <>
-                <Sparkles className="mr-2 h-5 w-5 animate-spin" />
+                <Sparkles className="mr-2 h-6 w-6 animate-spin" />
                 Minting...
               </>
             ) : mintedCount >= 1000 ? (
               "Sold Out!"
             ) : (
-              <>
-                <Sparkles className="mr-2 h-5 w-5" />
-                Mint NFT - 0.05 ETH
-              </>
+              "Mint Now for 0.08 ETH"
             )}
           </Button>
-
-          {/* Info */}
-          <p className="text-center text-sm text-muted-foreground font-fredoka">
-            Join the pack of adorable DapperDoggos! 🐾
-          </p>
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-6 flex justify-center gap-6 text-sm font-fredoka">
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            About
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            Roadmap
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            Discord
-          </a>
-          <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-            Twitter
-          </a>
-        </div>
-      </div>
+        {/* Dog Ticker */}
+        <DogTicker />
+      </main>
 
       {/* Success Dialog */}
       <MintSuccessDialog 
