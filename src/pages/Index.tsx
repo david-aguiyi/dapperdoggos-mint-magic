@@ -69,12 +69,6 @@ const Index = () => {
           <h2 className="font-luckiest text-2xl text-foreground">DapperDoggos</h2>
         </div>
 
-        <nav className="hidden md:flex gap-8 font-fredoka font-semibold text-foreground/70">
-          <a href="#" className="hover:text-foreground transition-colors">Home</a>
-          <a href="#" className="hover:text-foreground transition-colors">Mint</a>
-          <a href="#" className="hover:text-foreground transition-colors">Gallery</a>
-          <a href="#" className="hover:text-foreground transition-colors">Rarity</a>
-        </nav>
 
         {!isWalletConnected ? (
           <Button variant="hero" onClick={connectWallet}>
@@ -94,15 +88,15 @@ const Index = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 -mt-8">
         {/* Minting Live Badge */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 mb-6 border-2 border-primary/20 shadow-lg">
-          <p className="font-fredoka font-semibold text-primary flex items-center gap-2">
-            <Sparkles className="h-4 w-4 animate-pulse" />
+        <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4 border-2 border-primary/20 shadow-lg">
+          <p className="font-fredoka font-semibold text-sm text-primary flex items-center gap-2">
+            <Sparkles className="h-3 w-3 animate-pulse" />
             Minting Now Live
           </p>
         </div>
 
         {/* Title */}
-        <div className="text-center mb-8 max-w-4xl">
+        <div className="text-center mb-6 max-w-4xl">
           <h1 className="font-luckiest text-6xl md:text-7xl mb-4">
             <span className="text-foreground">Mint Your</span>
             <br />
@@ -110,21 +104,24 @@ const Index = () => {
               DapperDoggo
             </span>
           </h1>
-          <p className="font-fredoka text-lg text-foreground/70 max-w-2xl mx-auto">
+          <p className="font-fredoka text-lg text-foreground/70 max-w-2xl mx-auto mb-6">
             Join the revolution of digital collectibles. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.
           </p>
         </div>
 
+        {/* Dog Ticker */}
+        <DogTicker />
+
         {/* Mint Counter & Button */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-xl w-full space-y-6 border-2 border-primary/10 mb-6">
-          <div className="space-y-3">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 max-w-md w-full space-y-4 border-2 border-primary/10 mt-6">
+          <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="font-fredoka text-sm text-foreground/60">Minted</span>
-              <span className="font-fredoka font-bold text-2xl text-foreground">
+              <span className="font-fredoka text-xs text-foreground/60">Minted</span>
+              <span className="font-fredoka font-bold text-lg text-foreground">
                 <span className="text-primary">{mintedCount}</span> / 1000
               </span>
             </div>
-            <div className="relative h-3 bg-muted/30 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-muted/30 rounded-full overflow-hidden">
               <div 
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
@@ -134,8 +131,8 @@ const Index = () => {
 
           <Button 
             variant="hero" 
-            size="lg"
-            className="w-full text-xl py-6"
+            size="default"
+            className="w-full text-base py-4"
             disabled={!isWalletConnected || isMinting || mintedCount >= 1000}
             onClick={mintNFT}
           >
@@ -143,7 +140,7 @@ const Index = () => {
               "Connect Wallet to Mint"
             ) : isMinting ? (
               <>
-                <Sparkles className="mr-2 h-6 w-6 animate-spin" />
+                <Sparkles className="mr-2 h-5 w-5 animate-spin" />
                 Minting...
               </>
             ) : mintedCount >= 1000 ? (
@@ -153,9 +150,6 @@ const Index = () => {
             )}
           </Button>
         </div>
-
-        {/* Dog Ticker */}
-        <DogTicker />
       </main>
 
       {/* Success Dialog */}
