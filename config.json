@@ -1,6 +1,6 @@
 {
     "tokenStandard": "nft",
-    "number": 6,
+    "number": 10,
     "symbol": "DAPPER",
     "sellerFeeBasisPoints": 500,
     "isMutable": true,
@@ -12,6 +12,7 @@
         }
     ],
     "uploadMethod": "bundlr",
+    "collection": null,
     "ruleSet": null,
     "awsConfig": null,
     "sdriveApiKey": null,

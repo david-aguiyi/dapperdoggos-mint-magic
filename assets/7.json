@@ -1,0 +1,16 @@
+{
+    "name": "DAPPER #7",
+    "description": "Dapper Doggos NFT #7",
+    "properties": {
+        "files": [
+            {
+                "uri": "photo_2025-07-17_23-58-45.jpg",
+                "type": "image/jpg"
+            }
+        ]
+    },
+    "attributes": [],
+    "symbol": "DAPPER",
+    "image": "photo_2025-07-17_23-58-45.jpg",
+    "seller_fee_basis_points": 500
+}

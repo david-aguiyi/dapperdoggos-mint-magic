@@ -1,0 +1,16 @@
+{
+    "name": "DAPPER #4",
+    "description": "Dapper Doggos NFT #4",
+    "properties": {
+        "files": [
+            {
+                "uri": "https://gateway.irys.xyz/y3wdYAETsckqK7zDqrcDzvgwvyUNPJUkjuMXm4jg7gc?ext=jpg",
+                "type": "image/jpg"
+            }
+        ]
+    },
+    "attributes": [],
+    "symbol": "DAPPER",
+    "image": "https://gateway.irys.xyz/y3wdYAETsckqK7zDqrcDzvgwvyUNPJUkjuMXm4jg7gc?ext=jpg",
+    "seller_fee_basis_points": 500
+}

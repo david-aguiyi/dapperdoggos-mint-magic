@@ -1,0 +1,29 @@
+﻿{
+    "name":  "DAPPER #0",
+    "description":  "Dapper Doggos NFT #0",
+    "properties":  {
+                       "creators":  [
+                                        {
+                                            "address":  "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3",
+                                            "share":  100
+                                        },
+                                        {
+                                            "address":  "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3",
+                                            "share":  0
+                                        }
+                                    ],
+                       "files":  [
+                                     {
+                                         "uri":  "0.jpg",
+                                         "type":  "image/jpg"
+                                     }
+                                 ]
+                   },
+    "attributes":  [
+
+                   ],
+    "symbol":  "DAPPER",
+    "image":  "0.jpg",
+    "seller_fee_basis_points":  500
+}
+

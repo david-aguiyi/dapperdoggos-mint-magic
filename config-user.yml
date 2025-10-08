@@ -1,0 +1,4 @@
+﻿json_rpc_url: https://api.devnet.solana.com
+websocket_url: ""
+keypair_path: "C:\Users\Agavid\.config\solana\devnet.json"
+commitment: confirmed
