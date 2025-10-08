@@ -4,70 +4,58 @@
 
 **URL**: https://lovable.dev/projects/1910cbcb-6ddd-44fa-8415-226acb4958e9
 
-## How can I edit this code?
+# DapperDoggos — Mint Magic (devnet)
 
-There are several ways of editing your application.
+This project contains the assets and frontend for the DapperDoggos NFT mint using Metaplex Sugar (Candy Machine v3) on Solana devnet.
 
-**Use Lovable**
+## Important IDs
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1910cbcb-6ddd-44fa-8415-226acb4958e9) and start prompting.
+-   Collection mint: `7WEpDzHKABME2i1wznBhLG5qgC1Fry55GUoPgoEdFRhR`
+-   Candy Machine ID: `7SRsJioum1giHbJf8Pp3HdByyPgAhPRXpEL887jMMVXC`
+-   Example minted NFT (test mint): `CM5RGQDGqmb3hLcQf9cUGAF8cTDwDfV9kWBsCGs1Z3WU`
 
-Changes made via Lovable will be committed automatically to this repo.
+## Quick commands
 
-**Use your preferred IDE**
+Verify the on-chain candy machine:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```powershell
+.\sugar-windows-latest.exe verify --keypair C:\Users\Agavid\.config\solana\devnet.json --rpc-url https://api.devnet.solana.com
 ```
 
-**Edit a file directly in GitHub**
+Deploy (attach collection mint and write config lines):
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```powershell
+.\sugar-windows-latest.exe deploy --keypair C:\Users\Agavid\.config\solana\devnet.json --collection-mint <COLLECTION_MINT> --config .\config.json --rpc-url https://api.devnet.solana.com
+```
 
-**Use GitHub Codespaces**
+Mint one NFT (test):
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```powershell
+.\sugar-windows-latest.exe mint --keypair C:\Users\Agavid\.config\solana\devnet.json --rpc-url https://api.devnet.solana.com
+```
 
-## What technologies are used for this project?
+Run the frontend (Vite):
 
-This project is built with:
+```powershell
+# Ensure .env contains VITE_CANDY_MACHINE_ID, VITE_RPC_URL, VITE_WALLET_KEYPAIR
+npm install
+npm run dev
+# Open http://localhost:8080/
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Notes & troubleshooting
 
-## How can I deploy this project?
+-   Metadata files must be UTF-8 without BOM.
+-   `config.json` holds creators, seller fee, uploadMethod (bundlr), and guard config.
+-   If you see `DuplicateCreatorAddress` during mint, check `config.json` for duplicate creators and update on-chain via `sugar config update`.
 
-Simply open [Lovable](https://lovable.dev/projects/1910cbcb-6ddd-44fa-8415-226acb4958e9) and click on Share -> Publish.
+## Where things live
 
-## Can I connect a custom domain to my Lovable project?
+-   Assets and metadata: `assets/`
+-   Candy Machine config: `config.json`
+-   Upload cache: `cache.json`
+-   Scripts for convenience: `scripts/` (includes `mint-collection-from-cache.mjs` used during setup)
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+If you'd like, I can run a UI mint from the frontend and commit this README change for you.
