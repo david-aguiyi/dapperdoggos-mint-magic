@@ -1,0 +1,25 @@
+{
+    "name": "DAPPER2 #3",
+    "description": "Dapper Doggos Collection 2 - Special Edition #3",
+    "properties": {
+        "files": [
+            {
+                "uri": "3.jpg",
+                "type": "image/jpg"
+            }
+        ]
+    },
+    "attributes": [
+        {
+            "trait_type": "Collection",
+            "value": "DapperDoggos v2"
+        },
+        {
+            "trait_type": "Rarity",
+            "value": "Special"
+        }
+    ],
+    "symbol": "DAPPER2",
+    "image": "3.jpg",
+    "seller_fee_basis_points": 500
+}

@@ -25,9 +25,9 @@ export const MintSuccessDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md rounded-3xl bg-gradient-to-br from-card to-background border-4 border-primary font-fredoka">
-                <div className="text-center space-y-6 p-4">
-                    <h2 className="font-luckiest text-4xl text-primary animate-bounce-in">
+            <DialogContent className="max-w-lg w-full rounded-3xl bg-gradient-to-br from-card to-background border-4 border-primary font-fredoka">
+                <div className="text-center space-y-3 p-3">
+                    <h2 className="font-luckiest text-2xl text-primary animate-bounce-in">
                         Congrats! 🎉
                     </h2>
 
@@ -40,22 +40,24 @@ export const MintSuccessDialog = ({
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <p className="text-lg font-semibold text-foreground">
+                    <div className="space-y-1">
+                        <p className="text-sm font-semibold text-foreground">
                             Your DapperDoggo has been minted!
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                             Welcome to the pack! 🐕
                         </p>
                     </div>
 
-                    <div className="bg-muted/50 rounded-2xl p-4 space-y-2">
+                    <div className="bg-muted/50 rounded-2xl p-2 space-y-2">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Transaction Hash
                         </p>
-                        <div className="flex items-center justify-between gap-2 bg-card rounded-xl p-3">
-                            <code className="text-xs font-mono text-foreground truncate flex-1">
-                                {txHash}
+                        <div className="flex items-center gap-2 bg-card rounded-xl p-2">
+                            <code className="text-sm font-mono text-foreground flex-1 min-w-0">
+                                {txHash.length > 20 
+                                    ? `${txHash.slice(0, 10)}...${txHash.slice(-10)}` 
+                                    : txHash}
                             </code>
                             <Button
                                 size="icon"
@@ -66,26 +68,27 @@ export const MintSuccessDialog = ({
                                         "_blank"
                                     )
                                 }
-                                className="h-8 w-8"
+                                className="h-7 w-7 flex-shrink-0"
+                                title="View on Solana Explorer"
                             >
                                 <ExternalLink className="h-4 w-4" />
                             </Button>
                         </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 justify-center">
                         <Button
                             variant="hero"
                             onClick={shareOnTwitter}
-                            className="flex-1"
+                            className="w-32 text-sm py-3"
                         >
-                            <Twitter className="h-5 w-5" />
-                            Share on Twitter
+                            <Twitter className="h-4 w-4 mr-2" />
+                            Share
                         </Button>
                         <Button
                             variant="secondary"
                             onClick={() => onOpenChange(false)}
-                            className="flex-1"
+                            className="w-32 text-sm py-3"
                         >
                             Close
                         </Button>

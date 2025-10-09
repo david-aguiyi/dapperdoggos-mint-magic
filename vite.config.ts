@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
@@ -21,18 +21,10 @@ export default defineConfig(({ mode }) => ({
                 secure: false,
             },
         },
-        // Temporarily disable CSP for development
-        // headers: {
-        //     "Content-Security-Policy":
-        //         "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://127.0.0.1:3001 http://localhost:3001 ws://127.0.0.1:3001; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;",
-        // },
     },
     plugins: [
-        react({
-            jsxRuntime: "automatic"
-        }),
-        // Temporarily disable componentTagger for development
-        // mode === "development" && componentTagger()
+        react(),
+        mode === "development" && componentTagger()
     ].filter(Boolean),
     resolve: {
         alias: {

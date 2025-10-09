@@ -1,0 +1,30 @@
+{
+    "tokenStandard": "nft",
+    "number": 6,
+    "symbol": "DAPPER",
+    "sellerFeeBasisPoints": 500,
+    "isMutable": true,
+    "isSequential": false,
+    "creators": [
+        {
+            "address": "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3",
+            "share": 100
+        }
+    ],
+    "uploadMethod": "bundlr",
+    "collection": "7WEpDzHKABME2i1wznBhLG5qgC1Fry55GUoPgoEdFRhR",
+    "ruleSet": null,
+    "awsConfig": null,
+    "sdriveApiKey": null,
+    "nftStorageAuthToken": null,
+    "shdwStorageAccount": null,
+    "pinataConfig": null,
+    "hiddenSettings": null,
+    "guards": {
+        "solPayment": {
+            "amount": 1000000000,
+            "destination": "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3"
+        }
+    },
+    "maxEditionSupply": null
+}

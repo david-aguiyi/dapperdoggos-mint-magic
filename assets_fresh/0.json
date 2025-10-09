@@ -1,0 +1,25 @@
+{
+    "name": "DAPPER #0",
+    "description": "Dapper Doggos NFT #0 - Fresh Collection",
+    "properties": {
+        "files": [
+            {
+                "uri": "https://gateway.irys.xyz/ABDKKwJLZ4vnrrH2yNdLuwHbg5jDTUfH4LqiVG1kDcdn?ext=jpg",
+                "type": "image/jpg"
+            }
+        ]
+    },
+    "attributes": [
+        {
+            "trait_type": "Collection",
+            "value": "DapperDoggos Fresh"
+        },
+        {
+            "trait_type": "Rarity",
+            "value": "Common"
+        }
+    ],
+    "symbol": "DAPPER",
+    "image": "https://gateway.irys.xyz/ABDKKwJLZ4vnrrH2yNdLuwHbg5jDTUfH4LqiVG1kDcdn?ext=jpg",
+    "seller_fee_basis_points": 500
+}

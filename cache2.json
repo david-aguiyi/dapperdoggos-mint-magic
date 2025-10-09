@@ -1,0 +1,42 @@
+{
+  "program": {
+    "candyMachine": "",
+    "candyGuard": "",
+    "candyMachineCreator": "",
+    "collectionMint": "7WEpDzHKABME2i1wznBhLG5qgC1Fry55GUoPgoEdFRhR"
+  },
+  "items": {
+    "0": {
+      "name": "DAPPER2 #0",
+      "image_hash": "c8f011167239516e2106790e584ad2e3de7a53bf71c2624e6541b0e7c9c62366",
+      "image_link": "https://gateway.irys.xyz/7sXW1WFUQQvuGjKWkSCq5LU8nfdpK29QxiiSBYhAuQhE?ext=jpg",
+      "metadata_hash": "16dce148462a6bf3de0985d77d1abf4cd41fff2709edf6855ad1bf3c0b11a3c6",
+      "metadata_link": "https://gateway.irys.xyz/Xinrkupt7X73SeajtZYbRN3VCZyzWysu9H3iiGR66RB",
+      "onChain": false
+    },
+    "1": {
+      "name": "DAPPER2 #1",
+      "image_hash": "1dcc2ffcb61671365a2afb53b4c8b5f68c050da894d999d0969e186169b07a38",
+      "image_link": "https://gateway.irys.xyz/7oC6ocd6VYbEXrPMpYbCEjGVKtZkFh9Tb8584mYEoDjx?ext=jpg",
+      "metadata_hash": "c03ee691a0a30db8f6040091b179be57014ff9b1e3423d50e664dae3578a54bb",
+      "metadata_link": "https://gateway.irys.xyz/2xUENUHQMbiRskHAktXfUjKszDsy97FUGEM2rvjAAKYy",
+      "onChain": false
+    },
+    "2": {
+      "name": "DAPPER2 #2",
+      "image_hash": "5d6b4414fb021bfa2cbbf86874f593d1f0388fd6233c97a5d29f6f16858c2908",
+      "image_link": "https://gateway.irys.xyz/CMJsQNrP17Z3usQsEcc82T7Tt2QU4YmxwvaJroEc64Um?ext=jpg",
+      "metadata_hash": "b36c18f4819402f69d4b0bb4dd0be2a48374b3571a3c8554bdb329895748b681",
+      "metadata_link": "https://gateway.irys.xyz/Hfg2zMUcPE6UWALE6ZiDNEik11zJCfofmerzjBhfBs4s",
+      "onChain": false
+    },
+    "3": {
+      "name": "DAPPER2 #3",
+      "image_hash": "56a504863c434ce9e22681ef1b51c48cec53f6988c89f65949523966dbff49b4",
+      "image_link": "https://gateway.irys.xyz/8e4rUkb1anZuzqpNXQd96CQ9x9siZBGX6AYRezERQP5M?ext=jpg",
+      "metadata_hash": "937917ea028bc1bd93a9acc186fbfb33f6093b864e97f5d1c796e4e8fd42f2e0",
+      "metadata_link": "https://gateway.irys.xyz/6vGChuGZwH7ZEi6yWScTnGSaWnDbVNjDHN4SMmAYghKU",
+      "onChain": false
+    }
+  }
+}

@@ -7,7 +7,7 @@ This file explains how to run the frontend locally and how to configure it to co
 Create a `.env` file in the project root (already added during setup). Required variables:
 
 ```
-VITE_CANDY_MACHINE_ID=7SRsJioum1giHbJf8Pp3HdByyPgAhPRXpEL887jMMVXC
+VITE_CANDY_MACHINE_ID=DpzM97a4dwJ5qnFphJ8kr5uNxwQ6LDZLq6pqNDnkA5eo
 VITE_RPC_URL=https://api.devnet.solana.com
 VITE_WALLET_KEYPAIR=C:\Users\Agavid\.config\solana\devnet.json
 ```

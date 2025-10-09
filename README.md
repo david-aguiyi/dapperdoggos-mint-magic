@@ -11,7 +11,7 @@ This project contains the assets and frontend for the DapperDoggos NFT mint usin
 ## Important IDs
 
 -   Collection mint: `7WEpDzHKABME2i1wznBhLG5qgC1Fry55GUoPgoEdFRhR`
--   Candy Machine ID: `7SRsJioum1giHbJf8Pp3HdByyPgAhPRXpEL887jMMVXC`
+-   Candy Machine ID: `DpzM97a4dwJ5qnFphJ8kr5uNxwQ6LDZLq6pqNDnkA5eo`
 -   Example minted NFT (test mint): `CM5RGQDGqmb3hLcQf9cUGAF8cTDwDfV9kWBsCGs1Z3WU`
 
 ## Quick commands

@@ -1,17 +1,17 @@
 {
   "program": {
-    "candyMachine": "7SRsJioum1giHbJf8Pp3HdByyPgAhPRXpEL887jMMVXC",
+    "candyMachine": "3hZNjiccNnGL6f2kwndZgu8UjjQ7EUnWNtBNEZXpYTED",
     "candyGuard": "",
-    "candyMachineCreator": "HfMYuxni99SCHAuGXmFE12AZRP8kpSf89zD6QRifY8QK",
+    "candyMachineCreator": "DpcdKKmTAnRewGmbKW8xoCQ32B5XFzAgpdKFDDcLbYXk",
     "collectionMint": "7WEpDzHKABME2i1wznBhLG5qgC1Fry55GUoPgoEdFRhR"
   },
   "items": {
     "0": {
       "name": "DAPPER #0",
       "image_hash": "616ed62f3b7dabb6f55236b0e335509ca9dc7c7f3a4bd5866c901372a9f2be8d",
-      "image_link": "https://gateway.irys.xyz/D8nLUrAC1fyitH1E9BfHQGrHD5uMxqpzJMned9uEWUAe?ext=jpg",
-      "metadata_hash": "b35c49f8289d5895d3062a6dfccc240904d1dc658ba960f0c21ecea34b12692b",
-      "metadata_link": "https://gateway.irys.xyz/HEpYWpTFgjydFEXprcavS598HGMzdYf3mHywJ6NYetQ1",
+      "image_link": "https://gateway.irys.xyz/ABDKKwJLZ4vnrrH2yNdLuwHbg5jDTUfH4LqiVG1kDcdn?ext=jpg",
+      "metadata_hash": "23873b99faf083d812177956a6ef1dbb77f00fed0afcb452b8fe6af87ee7b80d",
+      "metadata_link": "https://gateway.irys.xyz/4CwzAXDsKoADEQdszWzzf5wZ199gsc34FLyAjNejt1NA",
       "onChain": false
     },
     "1": {

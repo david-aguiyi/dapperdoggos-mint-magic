@@ -21,9 +21,27 @@ app.post("/mint", (req, res) => {
     const { wallet } = req.body;
     console.log("Minting request for wallet:", wallet);
     
-    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --log-level info`;
-    exec(cmd, { cwd: process.cwd() }, async (err, stdout, stderr) => {
+    if (!wallet) {
+        return res.status(400).json({ error: "Wallet address is required" });
+    }
+    
+    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache_fresh.json --log-level info`;
+    exec(cmd, { cwd: process.cwd(), timeout: 60000 }, async (err, stdout, stderr) => {
         if (err) {
+            // Check if collection is sold out
+            const combinedOutput = (stdout || '') + (stderr || '');
+            console.log("Sugar output:", { stdout, stderr, combinedOutput });
+            
+            if (combinedOutput.includes('0 item(s) available') || 
+                combinedOutput.includes('items available') ||
+                combinedOutput.includes('AccountNotFound') ||
+                combinedOutput.includes('timeout')) {
+                return res.status(400).json({ 
+                    error: "Collection Sold Out! 🎉", 
+                    message: "All DapperDoggos have been minted!",
+                    isSoldOut: true 
+                });
+            }
             return res.status(500).json({ error: err.message, stderr });
         }
         // Try to parse mint and signature from stdout
@@ -151,7 +169,81 @@ app.post("/mint", (req, res) => {
             }
         }
 
-        res.json({ mint, signature, image, raw: stdout });
+        if (signature) {
+            res.json({ 
+                success: true, 
+                mint, 
+                signature, 
+                image, 
+                wallet,
+                explorerUrl: `https://explorer.solana.com/tx/${signature}?cluster=devnet`,
+                message: "NFT minted successfully!"
+            });
+        } else {
+            res.status(500).json({ 
+                error: "Failed to parse mint result", 
+                raw: stdout,
+                stderr 
+            });
+        }
+    });
+});
+
+// Collection status endpoint
+app.get("/collection/status", (req, res) => {
+    // Get real-time status from blockchain using Sugar
+    const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache_fresh.json`;
+    
+    exec(cmd, { cwd: process.cwd(), timeout: 30000 }, (err, stdout, stderr) => {
+        if (err) {
+            console.error("Error getting collection status:", err);
+            // Fallback to cache file
+            try {
+                const cachePath = './cache_fresh.json';
+                const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+                const items = cacheData.items || {};
+                const itemsArray = Object.values(items);
+                const totalItems = itemsArray.length;
+                
+                return res.json({
+                    success: true,
+                    itemsRedeemed: 0,
+                    itemsAvailable: totalItems,
+                    totalItems,
+                    symbol: "DAPPER",
+                    candyMachineId: cacheData.program?.candyMachine || null,
+                    collectionMint: cacheData.program?.collectionMint || null,
+                    isSoldOut: false,
+                    progress: 0
+                });
+            } catch (e) {
+                return res.status(500).json({ error: "Failed to get collection status" });
+            }
+        }
+        
+        // Parse the Sugar output
+        const redeemedMatch = stdout.match(/items redeemed:\s+(\d+)/i);
+        const availableMatch = stdout.match(/items available:\s+(\d+)/i);
+        const candyMachineMatch = stdout.match(/Candy machine ID:\s+([A-Za-z0-9]+)/);
+        const collectionMintMatch = stdout.match(/collection mint:\s+([A-Za-z0-9]+)/i);
+        
+        const itemsRedeemed = redeemedMatch ? parseInt(redeemedMatch[1]) : 0;
+        const totalItems = availableMatch ? parseInt(availableMatch[1]) : 6;
+        const itemsAvailable = totalItems - itemsRedeemed;
+        const candyMachineId = candyMachineMatch ? candyMachineMatch[1] : null;
+        const collectionMint = collectionMintMatch ? collectionMintMatch[1] : null;
+        
+        res.json({
+            success: true,
+            itemsRedeemed,
+            itemsAvailable,
+            totalItems,
+            symbol: "DAPPER",
+            candyMachineId,
+            collectionMint,
+            isSoldOut: itemsAvailable === 0,
+            progress: totalItems > 0 ? (itemsRedeemed / totalItems) * 100 : 0
+        });
     });
 });
 
