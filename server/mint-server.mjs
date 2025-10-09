@@ -18,6 +18,9 @@ const KEYPAIR =
 const RPC = process.env.RPC_URL || "https://api.devnet.solana.com";
 
 app.post("/mint", (req, res) => {
+    const { wallet } = req.body;
+    console.log("Minting request for wallet:", wallet);
+    
     const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --log-level info`;
     exec(cmd, { cwd: process.cwd() }, async (err, stdout, stderr) => {
         if (err) {

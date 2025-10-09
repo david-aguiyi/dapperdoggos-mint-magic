@@ -6,6 +6,7 @@ import { MintSuccessDialog } from "@/components/MintSuccessDialog";
 import { useConfetti } from "@/hooks/useConfetti";
 import { DogTicker } from "@/components/DogTicker";
 import dogNft from "@/assets/dapper-dog-nft.jpg";
+import { connectWallet, disconnectWallet, isWalletConnected as checkWalletConnected, getWalletAddress } from "@/utils/wallet";
 
 const Index = () => {
     const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -16,6 +17,21 @@ const Index = () => {
     const [txHash, setTxHash] = useState("");
     const [nftImageUrl, setNftImageUrl] = useState<string | null>(null);
     const { fireConfetti } = useConfetti();
+
+    // Check for existing wallet connection on page load
+    useEffect(() => {
+        const checkWalletConnection = () => {
+            if (checkWalletConnected()) {
+                const address = getWalletAddress();
+                if (address) {
+                    setWalletAddress(address);
+                    setIsWalletConnected(true);
+                }
+            }
+        };
+
+        checkWalletConnection();
+    }, []);
 
     // Simulate real-time minting by incrementing counter
     useEffect(() => {
@@ -29,23 +45,50 @@ const Index = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const connectWallet = async () => {
-        const mockAddress = "0x" + Math.random().toString(16).substr(2, 40);
-        setWalletAddress(mockAddress);
-        setIsWalletConnected(true);
-        toast({
-            title: "Wallet Connected! 🎉",
-            description: "Ready to mint your DapperDoggo!",
-        });
+    const handleConnectWallet = async () => {
+        try {
+            const address = await connectWallet();
+            if (address) {
+                setWalletAddress(address);
+                setIsWalletConnected(true);
+                toast({
+                    title: "Wallet Connected! 🎉",
+                    description: "Ready to mint your DapperDoggo!",
+                });
+            } else {
+                toast({
+                    title: "Connection Failed",
+                    description: "Please install Phantom wallet or try again.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error("Wallet connection error:", error);
+            toast({
+                title: "Connection Error",
+                description: "Failed to connect wallet. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const mintNFT = async () => {
+        if (!walletAddress) {
+            toast({
+                title: "Wallet Not Connected",
+                description: "Please connect your wallet first.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         setIsMinting(true);
         try {
-            const apiBase = process.env.VITE_API_URL || "http://127.0.0.1:3001";
+            const apiBase = process.env.VITE_API_URL || "http://localhost:3001";
             const resp = await fetch(`${apiBase}/mint`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ wallet: walletAddress }),
             });
             const json = await resp.json();
             if (!resp.ok) throw new Error(json.error || JSON.stringify(json));
@@ -94,7 +137,7 @@ const Index = () => {
                 </div>
 
                 {!isWalletConnected ? (
-                    <Button variant="hero" onClick={connectWallet}>
+                    <Button variant="hero" onClick={handleConnectWallet}>
                         <Wallet className="mr-2 h-5 w-5" />
                         Connect Wallet
                     </Button>

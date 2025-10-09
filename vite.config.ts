@@ -11,24 +11,29 @@ export default defineConfig(({ mode }) => ({
         port: 8080,
         proxy: {
             "/mint": {
-                target: "http://127.0.0.1:3001",
+                target: "http://localhost:3001",
                 changeOrigin: true,
                 secure: false,
             },
             "/api": {
-                target: "http://127.0.0.1:3001",
+                target: "http://localhost:3001",
                 changeOrigin: true,
                 secure: false,
             },
         },
-        headers: {
-            "Content-Security-Policy":
-                "default-src 'self'; connect-src 'self' http://127.0.0.1:3001 ws://127.0.0.1:3001; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;",
-        },
+        // Temporarily disable CSP for development
+        // headers: {
+        //     "Content-Security-Policy":
+        //         "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://127.0.0.1:3001 http://localhost:3001 ws://127.0.0.1:3001; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;",
+        // },
     },
-    plugins: [react(), mode === "development" && componentTagger()].filter(
-        Boolean
-    ),
+    plugins: [
+        react({
+            jsxRuntime: "automatic"
+        }),
+        // Temporarily disable componentTagger for development
+        // mode === "development" && componentTagger()
+    ].filter(Boolean),
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
