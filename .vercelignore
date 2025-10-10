@@ -15,6 +15,7 @@ assets/
 assets_new/
 assets_fresh/
 assets-mainnet/
+!src/assets/
 generated-nfts/
 DAPPER DOGGOS TRAIT FOLDER/
 scripts/
