@@ -37,5 +37,9 @@ export default defineConfig({
     },
     define: {
         global: "globalThis",
+        __DEFINES__: {},
+        __DEV__: false,
+        __APP_CONFIG__: {},
+        __LOVABLE_ENV__: {},
     },
 });
