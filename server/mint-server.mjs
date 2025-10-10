@@ -258,7 +258,7 @@ app.post("/mint", async (req, res) => {
 
         // Clean up active mint tracking
         activeMints.delete(mintKey);
-        
+
         if (signature) {
             res.json({ 
                 success: true, 
@@ -314,26 +314,26 @@ app.get("/collection/status", (req, res) => {
         // Parse the Sugar output
         const redeemedMatch = stdout.match(/items redeemed:\s+(\d+)/i);
         const availableMatch = stdout.match(/items available:\s+(\d+)/i);
-        const candyMachineMatch = stdout.match(/Candy machine ID:\s+([A-Za-z0-9]+)/);
+            const candyMachineMatch = stdout.match(/Candy machine ID:\s+([A-Za-z0-9]+)/);
         const collectionMintMatch = stdout.match(/collection mint:\s+([A-Za-z0-9]+)/i);
         
         const itemsRedeemed = redeemedMatch ? parseInt(redeemedMatch[1]) : 0;
         const totalItems = availableMatch ? parseInt(availableMatch[1]) : 6;
         const itemsAvailable = totalItems - itemsRedeemed;
-        const candyMachineId = candyMachineMatch ? candyMachineMatch[1] : null;
+            const candyMachineId = candyMachineMatch ? candyMachineMatch[1] : null;
         const collectionMint = collectionMintMatch ? collectionMintMatch[1] : null;
-        
-        res.json({
-            success: true,
-            itemsRedeemed,
-            itemsAvailable,
-            totalItems,
+            
+            res.json({
+                success: true,
+                itemsRedeemed,
+                itemsAvailable,
+                totalItems,
             symbol: "DAPPER",
-            candyMachineId,
+                candyMachineId,
             collectionMint,
-            isSoldOut: itemsAvailable === 0,
-            progress: totalItems > 0 ? (itemsRedeemed / totalItems) * 100 : 0
-        });
+                isSoldOut: itemsAvailable === 0,
+                progress: totalItems > 0 ? (itemsRedeemed / totalItems) * 100 : 0
+            });
     });
 });
 

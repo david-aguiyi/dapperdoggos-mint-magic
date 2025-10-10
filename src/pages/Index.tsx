@@ -25,7 +25,7 @@ const Index = () => {
     // Fetch collection status from backend
     const fetchCollectionStatus = async () => {
         try {
-            const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3001";
+            const apiBase = "https://dapperdoggos-api.onrender.com";
             const response = await fetch(`${apiBase}/collection/status`);
             const data = await response.json();
             
@@ -121,7 +121,7 @@ const Index = () => {
 
         setIsMinting(true);
         try {
-            const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3001";
+            const apiBase = "https://dapperdoggos-api.onrender.com";
             const resp = await fetch(`${apiBase}/mint`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
