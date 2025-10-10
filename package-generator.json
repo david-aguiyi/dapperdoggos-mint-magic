@@ -1,0 +1,18 @@
+{
+  "name": "dapper-doggos-generator",
+  "version": "1.0.0",
+  "description": "NFT generator for Dapper Doggos collection",
+  "main": "generate-nfts.js",
+  "scripts": {
+    "generate": "node generate-nfts.js",
+    "install-deps": "npm install canvas"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2"
+  },
+  "devDependencies": {},
+  "keywords": ["nft", "generator", "layered", "solana"],
+  "author": "Dapper Doggos Team",
+  "license": "MIT"
+}
+

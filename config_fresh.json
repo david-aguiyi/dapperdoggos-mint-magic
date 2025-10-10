@@ -1,14 +1,18 @@
 {
     "tokenStandard": "nft",
-    "number": 6,
+    "number": 250,
     "symbol": "DAPPER",
     "sellerFeeBasisPoints": 500,
     "isMutable": true,
     "isSequential": false,
     "creators": [
         {
-            "address": "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3",
-            "share": 100
+            "address": "ARTIST_WALLET_ADDRESS_HERE",
+            "share": 15
+        },
+        {
+            "address": "TEAM_MARKETING_WALLET_ADDRESS_HERE",
+            "share": 85
         }
     ],
     "uploadMethod": "bundlr",
@@ -22,7 +26,7 @@
     "hiddenSettings": null,
     "guards": {
         "solPayment": {
-            "amount": 1000000000,
+            "amount": 100000000,
             "destination": "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3"
         }
     },

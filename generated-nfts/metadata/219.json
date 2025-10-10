@@ -1,0 +1,49 @@
+{
+  "name": "Dapper Doggos #219",
+  "symbol": "DAPPER",
+  "description": "The most dapper doggos on the blockchain. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.",
+  "image": "ipfs://REPLACE_WITH_IPFS_HASH/219.png",
+  "external_url": "",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "PINKBG"
+    },
+    {
+      "trait_type": "Base",
+      "value": "DAPPERDOGGO"
+    },
+    {
+      "trait_type": "Clothing",
+      "value": "GREYTUXEDO"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "CIGAR"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "SUSPECTEYES"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "TOPHAT"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "219.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "YOUR_CREATOR_ADDRESS",
+        "share": 100
+      }
+    ]
+  },
+  "seller_fee_basis_points": 500
+}

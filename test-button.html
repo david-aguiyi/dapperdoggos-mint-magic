@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Test</title>
+</head>
+<body>
+    <h1>Button Test</h1>
+    <button onclick="testClick()" style="padding: 10px 20px; background: blue; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Test Button
+    </button>
+    <div id="result"></div>
+    
+    <script>
+        function testClick() {
+            console.log("Button clicked!");
+            document.getElementById("result").innerHTML = "Button works! " + new Date();
+        }
+    </script>
+</body>
+</html>
+
