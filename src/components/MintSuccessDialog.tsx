@@ -16,7 +16,19 @@ export const MintSuccessDialog = ({
     txHash,
 }: MintSuccessDialogProps) => {
     const shareOnTwitter = () => {
-        const text = "Just minted my DapperDoggo NFT! 🐶✨ #DapperDoggos #NFT";
+        const text = `🐕 DAPPERDOGGOS IS LIVE! 🚀
+
+✨ 250 Unique NFTs
+💰 Only 0.1 SOL ($20)
+🎨 Layered Artwork
+💎 5% Royalties
+
+Just minted mine! 🔥
+
+Mint now: dapperdoggos.com
+
+#SolanaNFT #DapperDoggos #NFTLaunch`;
+        
         window.open(
             `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
             "_blank"
@@ -64,7 +76,7 @@ export const MintSuccessDialog = ({
                                 variant="ghost"
                                 onClick={() =>
                                     window.open(
-                                        `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
+                                        `https://explorer.solana.com/tx/${txHash}`,
                                         "_blank"
                                     )
                                 }
@@ -78,9 +90,8 @@ export const MintSuccessDialog = ({
 
                     <div className="flex gap-3 justify-center">
                         <Button
-                            variant="hero"
                             onClick={shareOnTwitter}
-                            className="w-32 text-sm py-3"
+                            className="w-32 text-sm py-3 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                         >
                             <Twitter className="h-4 w-4 mr-2" />
                             Share

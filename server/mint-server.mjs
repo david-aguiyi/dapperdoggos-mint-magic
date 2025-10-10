@@ -14,24 +14,79 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 const KEYPAIR =
     process.env.SOL_KEYPAIR ||
-    `${process.env.USERPROFILE}\\.config\\solana\\devnet.json`;
-const RPC = process.env.RPC_URL || "https://api.devnet.solana.com";
+    `${process.env.USERPROFILE}\\.config\\solana\\mainnet.json`;
+const RPC = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
 
-app.post("/mint", (req, res) => {
-    const { wallet } = req.body;
-    console.log("Minting request for wallet:", wallet);
+// Track active mint requests to prevent duplicates
+const activeMints = new Map();
+
+app.post("/mint", async (req, res) => {
+    const { wallet, quantity = 1 } = req.body;
+    console.log(`Minting request for wallet: ${wallet}, quantity: ${quantity}`);
     
     if (!wallet) {
         return res.status(400).json({ error: "Wallet address is required" });
     }
     
-    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache_fresh.json --log-level info`;
-    exec(cmd, { cwd: process.cwd(), timeout: 60000 }, async (err, stdout, stderr) => {
+    // Check for duplicate mint requests
+    const mintKey = `${wallet}-${quantity}`;
+    if (activeMints.has(mintKey)) {
+        console.log(`Duplicate mint request detected for ${mintKey}, rejecting`);
+        return res.status(429).json({ 
+            error: "Mint already in progress", 
+            message: "Please wait for the current mint to complete before starting another one."
+        });
+    }
+    
+    // Mark this mint as active
+    activeMints.set(mintKey, Date.now());
+    
+    // Clean up after 2 minutes (in case something goes wrong)
+    setTimeout(() => {
+        activeMints.delete(mintKey);
+    }, 120000);
+    
+    if (quantity < 1 || quantity > 10) {
+        activeMints.delete(mintKey);
+        return res.status(400).json({ error: "Quantity must be between 1 and 10" });
+    }
+    
+    // Check wallet balance before minting
+    try {
+        const connection = new Connection(RPC, "confirmed");
+        const walletPubkey = new PublicKey(wallet);
+        const balance = await connection.getBalance(walletPubkey);
+        const balanceInSol = balance / 1000000000; // Convert lamports to SOL
+        
+        // Calculate required amount (price + estimated gas fees)
+        const pricePerNft = 0.1; // SOL per NFT
+        const estimatedGasFees = 0.01 * quantity; // ~0.01 SOL per NFT for gas
+        const requiredAmount = (pricePerNft * quantity) + estimatedGasFees;
+        
+        console.log(`Balance check: ${balanceInSol} SOL available, ${requiredAmount} SOL required`);
+        
+        if (balanceInSol < requiredAmount) {
+            return res.status(400).json({ 
+                error: "Insufficient Balance 💰", 
+                message: `You need at least ${requiredAmount.toFixed(2)} SOL (${(pricePerNft * quantity).toFixed(1)} SOL for ${quantity} NFT${quantity > 1 ? 's' : ''} + ~${estimatedGasFees.toFixed(2)} SOL gas fees). You currently have ${balanceInSol.toFixed(2)} SOL. Please add more SOL to your wallet.`,
+                isInsufficientFunds: true,
+                requiredAmount: requiredAmount.toFixed(2),
+                currentBalance: balanceInSol.toFixed(2)
+            });
+        }
+    } catch (balanceCheckError) {
+        console.error("Balance check error:", balanceCheckError);
+        // Continue with mint if balance check fails (fallback)
+    }
+    
+    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache-clean.json --log-level info --number ${quantity}`;
+    exec(cmd, { cwd: process.cwd(), timeout: 120000 }, async (err, stdout, stderr) => {
         if (err) {
-            // Check if collection is sold out
+            // Check for various error conditions
             const combinedOutput = (stdout || '') + (stderr || '');
             console.log("Sugar output:", { stdout, stderr, combinedOutput });
             
+            // Check if collection is sold out
             if (combinedOutput.includes('0 item(s) available') || 
                 combinedOutput.includes('items available') ||
                 combinedOutput.includes('AccountNotFound') ||
@@ -42,6 +97,38 @@ app.post("/mint", (req, res) => {
                     isSoldOut: true 
                 });
             }
+            
+            // Check for partial mint (this should not happen with pre-check, but handle it)
+            const partialMintMatch = combinedOutput.match(/Minted (\d+)\/(\d+) of the items/);
+            if (partialMintMatch) {
+                const minted = partialMintMatch[1];
+                const requested = partialMintMatch[2];
+                return res.status(400).json({ 
+                    error: "Partial Mint Occurred", 
+                    message: `Only ${minted} out of ${requested} NFTs were minted due to insufficient balance. Please check your wallet and contact support if needed.`,
+                    isPartialMint: true,
+                    mintedCount: parseInt(minted),
+                    requestedCount: parseInt(requested)
+                });
+            }
+            
+            // Check for insufficient funds
+            if (combinedOutput.includes('insufficient funds') || 
+                combinedOutput.includes('insufficient lamports') ||
+                combinedOutput.includes('Attempt to debit an account but found no record of a prior credit') ||
+                combinedOutput.includes('InsufficientFunds') ||
+                combinedOutput.toLowerCase().includes('not enough sol')) {
+                const requiredAmount = (quantity * 0.1).toFixed(1);
+                return res.status(400).json({ 
+                    error: "Insufficient Balance 💰", 
+                    message: `You need at least ${requiredAmount} SOL to mint ${quantity} NFT${quantity > 1 ? 's' : ''}. Please add more SOL to your wallet and try again.`,
+                    isInsufficientFunds: true,
+                    requiredAmount
+                });
+            }
+            
+            // Clean up active mint tracking on error
+            activeMints.delete(mintKey);
             return res.status(500).json({ error: err.message, stderr });
         }
         // Try to parse mint and signature from stdout
@@ -169,6 +256,9 @@ app.post("/mint", (req, res) => {
             }
         }
 
+        // Clean up active mint tracking
+        activeMints.delete(mintKey);
+        
         if (signature) {
             res.json({ 
                 success: true, 
@@ -192,14 +282,14 @@ app.post("/mint", (req, res) => {
 // Collection status endpoint
 app.get("/collection/status", (req, res) => {
     // Get real-time status from blockchain using Sugar
-    const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache_fresh.json`;
+        const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache-clean.json`;
     
     exec(cmd, { cwd: process.cwd(), timeout: 30000 }, (err, stdout, stderr) => {
         if (err) {
             console.error("Error getting collection status:", err);
             // Fallback to cache file
             try {
-                const cachePath = './cache_fresh.json';
+                const cachePath = './cache-clean.json';
                 const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
                 const items = cacheData.items || {};
                 const itemsArray = Object.values(items);
