@@ -32,15 +32,22 @@ function App() {
 
   const connectWallet = async () => {
     try {
-      if (window.solana && window.solana.isPhantom) {
-        const response = await window.solana.connect();
+      // Check for Solana wallet providers (Phantom, Solflare, Backpack, etc.)
+      const provider = window.solana || window.phantom?.solana;
+      
+      if (provider) {
+        console.log('Wallet provider found:', provider);
+        const response = await provider.connect();
+        console.log('Wallet connected:', response.publicKey.toString());
         setWalletAddress(response.publicKey.toString());
         setIsWalletConnected(true);
       } else {
-        alert('Phantom wallet not found! Please install Phantom wallet.');
+        alert('Solana wallet not found! Please install Phantom, Solflare, or another Solana wallet.');
+        window.open('https://phantom.app/', '_blank');
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
+      alert(`Failed to connect wallet: ${error.message}`);
     }
   };
 
