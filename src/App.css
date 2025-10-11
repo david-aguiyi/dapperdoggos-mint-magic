@@ -78,6 +78,7 @@ body {
   border-radius: 30px;
   font-size: 14px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
@@ -120,6 +121,7 @@ body {
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   border-radius: 20px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #d35400;
   font-size: 13px;
   margin-bottom: 16px;
@@ -156,6 +158,8 @@ body {
 
 .hero-description {
   font-size: 16px;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
+  font-weight: 400;
   color: #444;
   line-height: 1.5;
   max-width: 600px;
@@ -190,6 +194,7 @@ body {
 
 .minted-label {
   font-size: 16px;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #666;
   font-weight: 600;
 }
@@ -197,6 +202,7 @@ body {
 .minted-count {
   font-size: 24px;
   font-weight: 900;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #2D2D2D;
 }
 
@@ -239,6 +245,7 @@ body {
   border-radius: 6px;
   font-size: 18px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #667eea;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -261,6 +268,7 @@ body {
 .quantity {
   font-size: 18px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #2D2D2D;
   min-width: 25px;
   text-align: center;
@@ -275,6 +283,7 @@ body {
   border-radius: 10px;
   font-size: 16px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
@@ -300,6 +309,7 @@ body {
   border-radius: 12px;
   font-size: 18px;
   font-weight: 700;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
   display: flex;
   align-items: center;
   justify-content: center;
