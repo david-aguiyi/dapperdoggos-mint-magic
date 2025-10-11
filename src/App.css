@@ -87,8 +87,7 @@ body {
 }
 
 .wallet-icon {
-  font-size: 16px;
-  display: inline-block;
+  font-size: 14px;
 }
 
 .connect-wallet-btn:hover:not(:disabled) {

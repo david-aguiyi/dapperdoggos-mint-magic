@@ -130,7 +130,7 @@ function App() {
             onClick={connectWallet}
             disabled={isWalletConnected || isConnecting}
           >
-            <span className="wallet-icon">👛</span>
+            <i className="fa-solid fa-wallet wallet-icon"></i>
             {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
           </button>
         </div>
