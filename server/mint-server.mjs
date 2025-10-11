@@ -79,7 +79,7 @@ app.post("/mint", async (req, res) => {
         // Continue with mint if balance check fails (fallback)
     }
     
-    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache-clean.json --log-level info --number ${quantity}`;
+    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache.json --log-level info --number ${quantity}`;
     exec(cmd, { cwd: process.cwd(), timeout: 120000 }, async (err, stdout, stderr) => {
         if (err) {
             // Check for various error conditions
@@ -282,14 +282,14 @@ app.post("/mint", async (req, res) => {
 // Collection status endpoint
 app.get("/collection/status", (req, res) => {
     // Get real-time status from blockchain using Sugar
-        const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache-clean.json`;
+        const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache.json`;
     
     exec(cmd, { cwd: process.cwd(), timeout: 30000 }, (err, stdout, stderr) => {
         if (err) {
             console.error("Error getting collection status:", err);
             // Fallback to cache file
             try {
-                const cachePath = './cache-clean.json';
+                const cachePath = './cache.json';
                 const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
                 const items = cacheData.items || {};
                 const itemsArray = Object.values(items);
