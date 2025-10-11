@@ -9,6 +9,7 @@
     "build:server": "bash install-sugar.sh",
     "lint": "eslint .",
     "preview": "vite preview",
+    "start": "node server/mint-server.mjs",
     "start:api": "node server/mint-server.mjs"
   },
   "dependencies": {
