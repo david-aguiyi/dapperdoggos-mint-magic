@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import DogTicker from './components/DogTicker';
+import { useToast, ToastContainer } from './components/Toast';
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -10,6 +11,9 @@ function App() {
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [mintQuantity, setMintQuantity] = useState(1);
   const [isMinting, setIsMinting] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  
+  const toast = useToast();
 
   const API_BASE_URL = 'https://dapperdoggos-api.onrender.com';
 
@@ -31,6 +35,9 @@ function App() {
   };
 
   const connectWallet = async () => {
+    if (isConnecting) return;
+    
+    setIsConnecting(true);
     try {
       // Check for Solana wallet providers (Phantom, Solflare, Backpack, etc.)
       const provider = window.solana || window.phantom?.solana;
@@ -41,19 +48,22 @@ function App() {
         console.log('Wallet connected:', response.publicKey.toString());
         setWalletAddress(response.publicKey.toString());
         setIsWalletConnected(true);
+        toast.success('Wallet connected successfully!');
       } else {
-        alert('Solana wallet not found! Please install Phantom, Solflare, or another Solana wallet.');
+        toast.error('Solana wallet not found! Please install Phantom, Solflare, or another Solana wallet.');
         window.open('https://phantom.app/', '_blank');
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
-      alert(`Failed to connect wallet: ${error.message}`);
+      toast.error(`Failed to connect wallet: ${error.message}`);
+    } finally {
+      setIsConnecting(false);
     }
   };
 
   const mintNFT = async () => {
-    if (!isWalletConnected) {
-      alert('Please connect your wallet first!');
+    if (!isWalletConnected || !walletAddress) {
+      toast.error('Please connect your wallet first!');
       return;
     }
 
@@ -65,22 +75,36 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          walletAddress,
+          wallet: walletAddress,
           quantity: mintQuantity
         }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
       const data = await response.json();
+      console.log('Mint response:', data);
+      
+      if (!response.ok) {
+        // Handle specific error types
+        if (data.isInsufficientFunds) {
+          toast.error(`💰 Insufficient Balance: You need ${data.requiredAmount} SOL but only have ${data.currentBalance} SOL`);
+        } else {
+          toast.error(`Mint failed: ${data.error || data.message || 'Unknown error'}`);
+        }
+        return;
+      }
       
       if (data.success) {
-        alert(`Successfully minted ${mintQuantity} NFT(s)! View on Explorer: ${data.explorerUrl}`);
+        toast.success(`Successfully minted ${mintQuantity} NFT(s)! Check your wallet.`);
         fetchCollectionStatus(); // Refresh status
       } else {
-        alert(`Mint failed: ${data.error}`);
+        toast.error(`Mint failed: ${data.error || data.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error minting NFT:', error);
-      alert('Mint failed. Please try again.');
+      toast.error('Mint failed. Please try again.');
     } finally {
       setIsMinting(false);
     }
@@ -90,6 +114,8 @@ function App() {
 
   return (
     <div className="app">
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+      
       {/* Header */}
       <header className="header">
         <div className="header-content">
@@ -102,9 +128,9 @@ function App() {
           <button 
             className={`connect-wallet-btn ${isWalletConnected ? 'connected' : ''}`}
             onClick={connectWallet}
-            disabled={isWalletConnected}
+            disabled={isWalletConnected || isConnecting}
           >
-            {isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
+            {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
           </button>
         </div>
       </header>
@@ -113,7 +139,7 @@ function App() {
       <section className="hero">
         <div className="hero-content">
           <div className="minting-banner">
-            <span className="sparkle">✨</span>
+            <span className="sparkle-static">✨</span>
             Minting Now Live
           </div>
           <h2 className="main-title">
@@ -169,9 +195,19 @@ function App() {
               <button 
                 className="mint-btn"
                 onClick={mintNFT}
-                disabled={isMinting || !isWalletConnected}
+                disabled={isMinting || !isWalletConnected || !walletAddress}
               >
-                {isMinting ? 'Minting...' : `Mint ${mintQuantity} for ${(mintQuantity * 0.1).toFixed(1)} SOL`}
+                {isMinting ? (
+                  <>
+                    <span className="sparkle-rotating">✨</span>
+                    Minting...
+                  </>
+                ) : (
+                  <>
+                    <span className="sparkle-static">✨</span>
+                    Mint {mintQuantity} for {(mintQuantity * 0.1).toFixed(1)} SOL
+                  </>
+                )}
               </button>
             </div>
           )}
