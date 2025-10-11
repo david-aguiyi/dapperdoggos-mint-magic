@@ -116,25 +116,17 @@ function App() {
     <div className="app">
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       
-      {/* Header */}
-      <header className="header">
-        <div className="header-content">
-          <div className="logo-section">
-            <div className="logo">
-              <span className="logo-text">DD</span>
-            </div>
-            <h1 className="brand-name">DAPPERDOGGOS</h1>
-          </div>
-          <button 
-            className={`connect-wallet-btn ${isWalletConnected ? 'connected' : ''}`}
-            onClick={connectWallet}
-            disabled={isWalletConnected || isConnecting}
-          >
-            <i className="fa-solid fa-wallet wallet-icon"></i>
-            {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
-          </button>
-        </div>
-      </header>
+      {/* Connect Wallet Button */}
+      <div className="wallet-button-container">
+        <button 
+          className={`connect-wallet-btn ${isWalletConnected ? 'connected' : ''}`}
+          onClick={connectWallet}
+          disabled={isWalletConnected || isConnecting}
+        >
+          <i className="fa-solid fa-wallet wallet-icon"></i>
+          {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
+        </button>
+      </div>
 
       {/* Hero Section */}
       <section className="hero">
@@ -144,7 +136,7 @@ function App() {
             Minting Now Live
           </div>
           <h2 className="main-title">
-            MINT YOUR <span className="gradient-text">DAPPER</span>
+            MINT YOUR <span className="gradient-text">DAPPERDOGGO</span>
           </h2>
           <p className="hero-description">
             Join the revolution of digital collectibles. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.

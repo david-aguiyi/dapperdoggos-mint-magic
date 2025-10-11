@@ -17,56 +17,15 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-/* Header */
-.header {
-  padding: 24px 0;
-  /* background: rgba(255, 255, 255, 0.15); */
-  backdrop-filter: blur(12px);
-  flex-shrink: 0;
-}
-
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #FF01F8 0%, #C001BB 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 1, 248, 0.3);
-}
-
-.logo-text {
-  color: white;
-  font-size: 18px;
-  font-weight: 800;
-  font-family: 'Fredoka', 'Comic Sans MS', cursive;
-}
-
-.brand-name {
-  font-size: 22px;
-  font-weight: 900;
-  font-family: 'Luckiest Guy', cursive;
-  letter-spacing: 1px;
-  color: #2D2D2D;
-  text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.3);
+/* Wallet Button Container */
+.wallet-button-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
 .connect-wallet-btn {
