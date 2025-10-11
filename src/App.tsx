@@ -130,6 +130,7 @@ function App() {
             onClick={connectWallet}
             disabled={isWalletConnected || isConnecting}
           >
+            <span className="wallet-icon">👛</span>
             {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
           </button>
         </div>
@@ -143,7 +144,7 @@ function App() {
             Minting Now Live
           </div>
           <h2 className="main-title">
-            MINT YOUR <span className="gradient-text">DAPPERDOGGO</span>
+            MINT YOUR <span className="gradient-text">DAPPER</span>
           </h2>
           <p className="hero-description">
             Join the revolution of digital collectibles. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.

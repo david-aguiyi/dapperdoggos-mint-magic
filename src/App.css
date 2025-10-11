@@ -24,7 +24,6 @@ body {
   padding: 12px 0;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
 }
 
@@ -82,6 +81,14 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wallet-icon {
+  font-size: 16px;
+  display: inline-block;
 }
 
 .connect-wallet-btn:hover:not(:disabled) {
@@ -116,14 +123,14 @@ body {
 .minting-banner {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 20px;
+  gap: 4px;
+  padding: 6px 16px;
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  border-radius: 20px;
+  border-radius: 16px;
   font-weight: 700;
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #d35400;
-  font-size: 13px;
+  font-size: 11px;
   margin-bottom: 16px;
   box-shadow: 0 4px 12px rgba(252, 182, 159, 0.4);
 }
@@ -139,7 +146,7 @@ body {
 }
 
 .main-title {
-  font-size: 48px;
+  font-size: 64px;
   font-weight: 900;
   line-height: 1.2;
   margin-bottom: 16px;
@@ -356,7 +363,7 @@ body {
   }
 
   .main-title {
-    font-size: 40px;
+    font-size: 48px;
   }
 
   .hero-description {
@@ -379,7 +386,7 @@ body {
 
 @media (max-width: 480px) {
   .main-title {
-    font-size: 32px;
+    font-size: 36px;
   }
 
   .logo {
