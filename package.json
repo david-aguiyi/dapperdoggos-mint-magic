@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:server": "bash install-sugar.sh",
+    "postinstall": "bash install-sugar.sh || echo 'Sugar install skipped'",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node server/mint-server.mjs",
