@@ -11,7 +11,7 @@
 .dog-ticker {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .dog-ticker-track {
@@ -35,7 +35,7 @@
   width: 150px;
   height: 150px;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
 }
@@ -51,6 +51,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 20px;
+  border: 2px solid #fc03ed73;
 }
 
 /* Pause animation on hover */

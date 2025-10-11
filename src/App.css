@@ -21,8 +21,8 @@ body {
 
 /* Header */
 .header {
-  padding: 12px 0;
-  background: rgba(255, 255, 255, 0.15);
+  padding: 24px 0;
+  /* background: rgba(255, 255, 255, 0.15); */
   backdrop-filter: blur(12px);
   flex-shrink: 0;
 }
@@ -70,7 +70,7 @@ body {
 }
 
 .connect-wallet-btn {
-  padding: 8px 24px;
+  padding: 11px 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
@@ -123,13 +123,14 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 16px;
+  padding: 5px 8px;
+  border: 2px solid #ff9e5f;
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   border-radius: 16px;
-  font-weight: 700;
+  font-weight: 600;
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
   color: #d35400;
-  font-size: 11px;
+  font-size: 14px;
   margin-bottom: 16px;
   box-shadow: 0 4px 12px rgba(252, 182, 159, 0.4);
 }
