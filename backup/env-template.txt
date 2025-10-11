@@ -1,0 +1,7 @@
+# Environment Variables for Clean Frontend
+VITE_API_URL=https://dapperdoggos-api.onrender.com
+VITE_CANDY_MACHINE_ID=9xFDkMxCNMHBe9MHtsiq6rzW11eVhn4WgNYVQCshXFR
+VITE_COLLECTION_MINT=GxNrdhyh1ji1ncXEpfbG3rgYDEAWNuWk8Ti1oxtdgZ5z
+VITE_NETWORK=mainnet-beta
+VITE_RPC_URL=https://api.mainnet-beta.solana.com
+

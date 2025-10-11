@@ -1,0 +1,83 @@
+.dog-ticker-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  margin: 20px 0;
+}
+
+.dog-ticker {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dog-ticker-track {
+  display: flex;
+  gap: 20px;
+  animation: scroll 30s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.dog-ticker-item {
+  flex-shrink: 0;
+  width: 150px;
+  height: 150px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.dog-ticker-item:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.dog-ticker-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Pause animation on hover */
+.dog-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .dog-ticker-item {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .dog-ticker-track {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dog-ticker-item {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .dog-ticker-track {
+    gap: 10px;
+    animation: scroll 20s linear infinite;
+  }
+}
+
