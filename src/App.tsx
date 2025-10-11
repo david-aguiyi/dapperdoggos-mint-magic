@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import DogTicker from './components/DogTicker';
 import { useToast, ToastContainer } from './components/Toast';
@@ -40,7 +40,7 @@ function App() {
     setIsConnecting(true);
     try {
       // Check for Solana wallet providers (Phantom, Solflare, Backpack, etc.)
-      const provider = window.solana || window.phantom?.solana;
+      const provider = (window as any).solana || (window as any).phantom?.solana;
       
       if (provider) {
         console.log('Wallet provider found:', provider);
@@ -53,7 +53,7 @@ function App() {
         toast.error('Solana wallet not found! Please install Phantom, Solflare, or another Solana wallet.');
         window.open('https://phantom.app/', '_blank');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error connecting wallet:', error);
       toast.error(`Failed to connect wallet: ${error.message}`);
     } finally {

@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './Toast.css';
 
-const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
+interface ToastProps {
+  message: string;
+  type?: 'info' | 'success' | 'error' | 'warning';
+  duration?: number;
+  onClose?: () => void;
+}
+
+interface ToastItem {
+  id: number;
+  message: string;
+  type: 'info' | 'success' | 'error' | 'warning';
+  duration: number;
+}
+
+const Toast = ({ message, type = 'info', duration = 3000, onClose }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -45,7 +59,7 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
 };
 
 // Toast Container Component
-export const ToastContainer = ({ toasts, removeToast }) => {
+export const ToastContainer = ({ toasts, removeToast }: { toasts: ToastItem[], removeToast: (id: number) => void }) => {
   return (
     <div className="toast-container">
       {toasts.map((toast) => (
@@ -63,21 +77,21 @@ export const ToastContainer = ({ toasts, removeToast }) => {
 
 // Hook for managing toasts
 export const useToast = () => {
-  const [toasts, setToasts] = useState([]);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const addToast = (message, type = 'info', duration = 3000) => {
+  const addToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration = 3000) => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message, type, duration }]);
   };
 
-  const removeToast = (id) => {
+  const removeToast = (id: number) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  const success = (message, duration) => addToast(message, 'success', duration);
-  const error = (message, duration) => addToast(message, 'error', duration);
-  const warning = (message, duration) => addToast(message, 'warning', duration);
-  const info = (message, duration) => addToast(message, 'info', duration);
+  const success = (message: string, duration?: number) => addToast(message, 'success', duration);
+  const error = (message: string, duration?: number) => addToast(message, 'error', duration);
+  const warning = (message: string, duration?: number) => addToast(message, 'warning', duration);
+  const info = (message: string, duration?: number) => addToast(message, 'info', duration);
 
   return { toasts, addToast, removeToast, success, error, warning, info };
 };
