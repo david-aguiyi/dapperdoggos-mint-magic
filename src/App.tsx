@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import DogTicker from './components/DogTicker';
 import { useToast, ToastContainer } from './components/Toast';
+import MintSuccessModal from './components/MintSuccessModal';
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -12,6 +13,8 @@ function App() {
   const [mintQuantity, setMintQuantity] = useState(1);
   const [isMinting, setIsMinting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState(null);
   
   const toast = useToast();
 
@@ -99,6 +102,16 @@ function App() {
       if (data.success) {
         toast.success(`Successfully minted ${mintQuantity} NFT(s)! Check your wallet.`);
         fetchCollectionStatus(); // Refresh status
+        
+        // Show success modal with mint data
+        setSuccessData({
+          mint: data.mint,
+          signature: data.signature,
+          image: data.image,
+          wallet: walletAddress,
+          quantity: mintQuantity
+        });
+        setShowSuccessModal(true);
       } else {
         toast.error(`Mint failed: ${data.error || data.message || 'Unknown error'}`);
       }
@@ -118,15 +131,15 @@ function App() {
       
       {/* Connect Wallet Button */}
       <div className="wallet-button-container">
-        <button 
-          className={`connect-wallet-btn ${isWalletConnected ? 'connected' : ''}`}
-          onClick={connectWallet}
-          disabled={isWalletConnected || isConnecting}
-        >
+          <button 
+            className={`connect-wallet-btn ${isWalletConnected ? 'connected' : ''}`}
+            onClick={connectWallet}
+            disabled={isWalletConnected || isConnecting}
+          >
           <i className="fa-solid fa-wallet wallet-icon"></i>
-          {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
-        </button>
-      </div>
+            {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
+          </button>
+        </div>
 
       {/* Hero Section */}
       <section className="hero">
@@ -206,6 +219,13 @@ function App() {
           )}
         </div>
       </section>
+
+      {/* Mint Success Modal */}
+      <MintSuccessModal 
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        mintData={successData}
+      />
     </div>
   );
 }
