@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  background: linear-gradient(135deg, #B4DBFF 0%, #E8F2FF 100%);
   height: 100vh;
   color: #2D2D2D;
   overflow: hidden;
@@ -45,12 +45,12 @@ body {
 .logo {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background: linear-gradient(135deg, #FF01F8 0%, #C001BB 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 1, 248, 0.3);
 }
 
 .logo-text {
@@ -71,7 +71,7 @@ body {
 
 .connect-wallet-btn {
   padding: 11px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF01F8 0%, #C001BB 100%);
   color: white;
   border: none;
   border-radius: 30px;
@@ -80,7 +80,7 @@ body {
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 1, 248, 0.4);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -92,7 +92,7 @@ body {
 
 .connect-wallet-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(255, 1, 248, 0.5);
 }
 
 .connect-wallet-btn:disabled {
@@ -101,7 +101,7 @@ body {
 }
 
 .connect-wallet-btn.connected {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #00D9A3 0%, #00B881 100%);
 }
 
 /* Hero Section */
@@ -124,15 +124,15 @@ body {
   align-items: center;
   gap: 4px;
   padding: 5px 8px;
-  border: 2px solid #ff9e5f;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  border: 2px solid #FF4242;
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFCCCC 100%);
   border-radius: 16px;
   font-weight: 600;
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
-  color: #d35400;
+  color: #CC0000;
   font-size: 14px;
   margin-bottom: 16px;
-  box-shadow: 0 4px 12px rgba(252, 182, 159, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 66, 66, 0.4);
 }
 
 .sparkle {
@@ -156,7 +156,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #FF01F8 0%, #FF4242 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -224,7 +224,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #FF01F8 0%, #FF4242 100%);
   transition: width 0.5s ease;
   border-radius: 10px;
 }
@@ -253,7 +253,7 @@ body {
   font-size: 18px;
   font-weight: 700;
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
-  color: #667eea;
+  color: #FF01F8;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -262,7 +262,7 @@ body {
 }
 
 .quantity-btn:hover:not(:disabled) {
-  background: #667eea;
+  background: #FF01F8;
   color: white;
   transform: scale(1.1);
 }
@@ -284,7 +284,7 @@ body {
 .mint-btn {
   flex: 1;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF01F8 0%, #C001BB 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -293,12 +293,12 @@ body {
   font-family: 'Fredoka', 'Comic Sans MS', cursive;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 1, 248, 0.4);
 }
 
 .mint-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(255, 1, 248, 0.5);
 }
 
 .mint-btn:disabled {
@@ -310,7 +310,7 @@ body {
 .sold-out-btn {
   width: 100%;
   padding: 16px 32px;
-  background: linear-gradient(135deg, #f5576c 0%, #c44569 100%);
+  background: linear-gradient(135deg, #FF4242 0%, #CC0000 100%);
   color: white;
   border: none;
   border-radius: 12px;
