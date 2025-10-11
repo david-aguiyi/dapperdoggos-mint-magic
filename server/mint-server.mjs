@@ -17,6 +17,10 @@ const KEYPAIR =
     `${process.env.USERPROFILE}\\.config\\solana\\mainnet.json`;
 const RPC = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
 
+// Detect OS and use appropriate Sugar binary
+const isWindows = process.platform === "win32";
+const SUGAR_CMD = isWindows ? ".\\sugar-windows-latest.exe" : "./sugar";
+
 // Track active mint requests to prevent duplicates
 const activeMints = new Map();
 
@@ -79,7 +83,7 @@ app.post("/mint", async (req, res) => {
         // Continue with mint if balance check fails (fallback)
     }
     
-    const cmd = `.\\sugar-windows-latest.exe mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache-mainnet.json --log-level info --number ${quantity}`;
+    const cmd = `${SUGAR_CMD} mint --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${wallet} --cache cache-mainnet.json --log-level info --number ${quantity}`;
     exec(cmd, { cwd: process.cwd(), timeout: 120000 }, async (err, stdout, stderr) => {
         if (err) {
             // Check for various error conditions
@@ -282,7 +286,7 @@ app.post("/mint", async (req, res) => {
 // Collection status endpoint
 app.get("/collection/status", (req, res) => {
     // Get real-time status from blockchain using Sugar
-        const cmd = `.\\sugar-windows-latest.exe show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache-mainnet.json`;
+        const cmd = `${SUGAR_CMD} show --keypair ${KEYPAIR} --rpc-url ${RPC} --cache cache-mainnet.json`;
     
     exec(cmd, { cwd: process.cwd(), timeout: 30000 }, (err, stdout, stderr) => {
         if (err) {
