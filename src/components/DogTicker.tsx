@@ -1,4 +1,3 @@
-import React from 'react';
 import './DogTicker.css';
 
 function DogTicker() {
@@ -36,4 +35,3 @@ function DogTicker() {
 }
 
 export default DogTicker;
-
