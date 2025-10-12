@@ -16,16 +16,20 @@ interface ToastItem {
 }
 
 const Toast = ({ message, type = 'info', duration = 3000, onClose }: ToastProps) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(() => onClose && onClose(), 300); // Wait for animation
+      handleClose();
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration, onClose]);
+  }, [duration]);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => onClose && onClose(), 300); // Wait for slideOut animation
+  };
 
   const getTypeClass = () => {
     switch (type) {
@@ -47,13 +51,11 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }: ToastProps)
     }
   };
 
-  if (!isVisible) return null;
-
   return (
-    <div className={`toast ${getTypeClass()}`}>
+    <div className={`toast ${getTypeClass()} ${isClosing ? 'toast-closing' : ''}`}>
       <span className="toast-icon">{getIcon()}</span>
       <span className="toast-message">{message}</span>
-      <button className="toast-close" onClick={() => setIsVisible(false)}>×</button>
+      <button className="toast-close" onClick={handleClose}>×</button>
     </div>
   );
 };
