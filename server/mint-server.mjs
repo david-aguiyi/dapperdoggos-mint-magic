@@ -140,11 +140,12 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Use mintV2 instead of deprecated mint
-            const { nft, response } = await metaplex.candyMachines().mintV2({
+            // Mint with group parameter for v2 compatibility
+            const { nft, response } = await metaplex.candyMachines().mint({
                 candyMachine,
                 collectionUpdateAuthority: authorityKeypair.publicKey,
                 owner: receiverPubkey,
+                group: "public", // Use guard group for v2
             });
             
             mintResults.push({
