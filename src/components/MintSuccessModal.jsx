@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './MintSuccessModal.css';
 
 const MintSuccessModal = ({ isOpen, onClose, mintData }) => {
+  const [showAllNFTs, setShowAllNFTs] = useState(false);
+  
   if (!isOpen || !mintData) return null;
 
   const { mint, signature, image, wallet, quantity } = mintData;
@@ -34,7 +36,11 @@ const MintSuccessModal = ({ isOpen, onClose, mintData }) => {
 
         {/* NFT Images */}
         <div className="nft-images-container">
-          <div className="nft-image-wrapper">
+          <div 
+            className={`nft-image-wrapper ${quantity > 1 ? 'clickable' : ''}`}
+            onClick={() => quantity > 1 && setShowAllNFTs(true)}
+            title={quantity > 1 ? 'Click to view all NFTs' : ''}
+          >
             {image ? (
               <img src={image} alt="Minted NFT" className="nft-image" />
             ) : (
@@ -44,10 +50,42 @@ const MintSuccessModal = ({ isOpen, onClose, mintData }) => {
               </div>
             )}
             {quantity > 1 && (
-              <div className="quantity-badge">+{quantity - 1}</div>
+              <>
+                <div className="quantity-badge">+{quantity - 1}</div>
+                <div className="click-hint">
+                  <i className="fa-solid fa-hand-pointer"></i> Click to view all
+                </div>
+              </>
             )}
           </div>
         </div>
+
+        {/* All NFTs Gallery Popup */}
+        {showAllNFTs && (
+          <div className="nfts-gallery-overlay" onClick={() => setShowAllNFTs(false)}>
+            <div className="nfts-gallery-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="gallery-close-btn" onClick={() => setShowAllNFTs(false)}>
+                <i className="fa-solid fa-times"></i>
+              </button>
+              <h3 className="gallery-title">Your {quantity} DapperDoggos</h3>
+              <div className="gallery-grid">
+                {[...Array(quantity)].map((_, index) => (
+                  <div key={index} className="gallery-item">
+                    {image ? (
+                      <img src={image} alt={`NFT ${index + 1}`} className="gallery-image" />
+                    ) : (
+                      <div className="gallery-placeholder">
+                        <i className="fa-solid fa-image"></i>
+                        <span>NFT #{index + 1}</span>
+                      </div>
+                    )}
+                    <div className="gallery-item-number">#{index + 1}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Transaction Info */}
         <div className="transaction-info">
@@ -92,3 +130,4 @@ const MintSuccessModal = ({ isOpen, onClose, mintData }) => {
 };
 
 export default MintSuccessModal;
+
