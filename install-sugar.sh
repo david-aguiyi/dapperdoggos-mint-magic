@@ -1,6 +1,12 @@
 #!/bin/bash
 # Install Sugar CLI for Linux (used by Render/Railway)
 
+# Skip Sugar installation on Vercel (frontend-only deployment)
+if [ "$VERCEL" = "1" ]; then
+    echo "Skipping Sugar installation on Vercel"
+    exit 0
+fi
+
 if [ "$OSTYPE" != "win32" ] && [ ! -f "./sugar" ]; then
     echo "Installing Sugar CLI for Linux..."
     
@@ -15,6 +21,5 @@ else
     echo "Sugar already installed or running on Windows"
 fi
 
-# Install npm dependencies
-npm install
+
 

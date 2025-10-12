@@ -8,18 +8,18 @@ function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [mintedCount, setMintedCount] = useState(0);
-  const [totalSupply, setTotalSupply] = useState(249);
+  const [totalSupply, setTotalSupply] = useState(250);
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [mintQuantity, setMintQuantity] = useState(1);
   const [isMinting, setIsMinting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successData, setSuccessData] = useState({
-    mint: 'DemoMintAddress123456789',
-    signature: '5KjHK7VdJq8xYZ2rP9mN3wX4tQ1cR6sV8uB7gF9hD2eL3aM4nP5oT6rQ7sU8vW9x',
-    image: '/nfts/1.png',
-    wallet: 'YourWalletAddress123456',
-    quantity: 2
+    mint: '',
+    signature: '',
+    image: '',
+    wallet: '',
+    quantity: 1
   });
   
   const toast = useToast();
@@ -36,7 +36,7 @@ function App() {
       const response = await fetch(`${API_BASE_URL}/collection/status`);
       const data = await response.json();
       setMintedCount(data.itemsRedeemed);
-      setTotalSupply(data.totalItems);
+      setTotalSupply(250); // Override backend total with correct value
       setIsSoldOut(data.isSoldOut);
     } catch (error) {
       console.error('Error fetching collection status:', error);

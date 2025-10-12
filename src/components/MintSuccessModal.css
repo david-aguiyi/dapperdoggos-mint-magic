@@ -27,22 +27,7 @@
 }
 
 .close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #666;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
+  display: none;
 }
 
 .close-btn:hover {
@@ -161,12 +146,19 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s ease;
+  white-space: nowrap;
+  width: max-content;
 }
 
 .nft-image-wrapper.clickable:hover .click-hint {
   opacity: 1;
+}
+
+/* Hide click hint if not clickable */
+.nft-image-wrapper:not(.clickable) .click-hint {
+  display: none;
 }
 
 .transaction-info {
@@ -250,17 +242,7 @@
 }
 
 .close-modal-btn {
-  background: linear-gradient(135deg, #FF01F8 0%, #C001BB 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 14px 20px;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: 'Fredoka', 'Comic Sans MS', cursive;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 1, 248, 0.4);
+  display: none;
 }
 
 .close-modal-btn:hover {
@@ -288,8 +270,10 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
   border-radius: 24px;
   padding: 32px;
-  max-width: 700px;
+  max-width: 600px;
   width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   border: 2px solid #FF01F8;
@@ -300,10 +284,10 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: none;
+  background: #FF01F8;
+  color: white;
   border: none;
   font-size: 24px;
-  color: #666;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
@@ -313,12 +297,14 @@
   justify-content: center;
   width: 40px;
   height: 40px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(255, 1, 248, 0.4);
 }
 
 .gallery-close-btn:hover {
-  background: #f0f0f0;
-  color: #FF01F8;
+  background: #C001BB;
   transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(255, 1, 248, 0.6);
 }
 
 .gallery-title {
@@ -326,7 +312,9 @@
   font-weight: 900;
   font-family: 'Luckiest Guy', cursive;
   color: #000000;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  margin-top: 0;
+  padding-top: 48px;
   text-align: center;
   background: linear-gradient(135deg, #FF01F8 0%, #FF4242 100%);
   -webkit-background-clip: text;
@@ -336,11 +324,20 @@
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  max-height: 500px;
-  overflow-y: auto;
   padding: 8px;
+  justify-items: center;
+  place-items: center;
+  margin: 0 auto;
+  justify-content: center;
+  width: fit-content;
+}
+
+@media (min-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .gallery-item {
@@ -348,6 +345,8 @@
   border-radius: 16px;
   overflow: hidden;
   aspect-ratio: 1;
+  width: 100%;
+  max-width: 200px;
   box-shadow: 0 4px 16px rgba(255, 1, 248, 0.3);
   border: 2px solid #FF01F8;
   transition: all 0.3s ease;
@@ -447,6 +446,20 @@
   .action-buttons {
     flex-direction: column;
   }
+
+  .nfts-gallery-modal {
+    padding: 24px;
+    max-width: 95%;
+    max-height: 85vh;
+  }
+
+  .gallery-title {
+    font-size: 20px;
+  }
+
+  .gallery-grid {
+    gap: 12px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -461,6 +474,19 @@
   .nft-image-wrapper {
     width: 140px;
     height: 140px;
+  }
+
+  .nfts-gallery-modal {
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .gallery-title {
+    font-size: 18px;
+  }
+
+  .gallery-grid {
+    gap: 10px;
   }
 }
 
