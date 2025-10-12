@@ -1,0 +1,28 @@
+{
+    "price": 0.003,
+    "number": 250,
+    "gatekeeper": null,
+    "solTreasuryAccount": "EWHcReRihcC4KCKrDeZ38RYwbmuMB69DUScY6nKPLwW3",
+    "splTokenAccount": null,
+    "splToken": null,
+    "goLiveDate": "2024-01-01T00:00:00Z",
+    "endSettings": null,
+    "whitelistMintSettings": null,
+    "hiddenSettings": null,
+    "uploadMethod": "bundlr",
+    "retainAuthority": true,
+    "isMutable": true,
+    "symbol": "DAPPER",
+    "sellerFeeBasisPoints": 500,
+    "creators": [
+        {
+            "address": "EuKLEAf54ae7SVLpchWDdCYBVhekbKf2D5hk95quaj1w",
+            "share": 15
+        },
+        {
+            "address": "2KHb61igaD4F1ChHL9aizDtkFPnVKfMmhmfFciESoY1q",
+            "share": 85
+        }
+    ]
+}
+

@@ -217,7 +217,7 @@ function App() {
                 ) : (
                   <>
                     <span className="sparkle-static">✨</span>
-                    Mint {mintQuantity} for {(mintQuantity * 0.003).toFixed(3)} SOL
+                    Mint {mintQuantity} for {(mintQuantity * 0.1).toFixed(1)} SOL
                   </>
                 )}
               </button>
