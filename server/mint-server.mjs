@@ -140,7 +140,8 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            const { nft, response } = await metaplex.candyMachines().mint({
+            // Use mintV2 instead of deprecated mint
+            const { nft, response } = await metaplex.candyMachines().mintV2({
                 candyMachine,
                 collectionUpdateAuthority: authorityKeypair.publicKey,
                 owner: receiverPubkey,
