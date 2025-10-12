@@ -1,10 +1,6 @@
-# Welcome to your Lovable project
+# DapperDoggos — Mint Magic (Mainnet)
 
-## Project info
-
-**URL**: https://lovable.dev/projects/1910cbcb-6ddd-44fa-8415-226acb4958e9
-
-# DapperDoggos — Mint Magic (devnet)
+> **Note:** This project was initially scaffolded with Lovable but is now fully independent. Lovable does not affect production deployment or functionality.
 
 This project contains the assets and frontend for the DapperDoggos NFT mint using Metaplex Sugar (Candy Machine v3) on Solana devnet.
 

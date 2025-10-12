@@ -72,7 +72,7 @@ function App() {
 
   const mintNFT = async () => {
     if (!isWalletConnected || !walletAddress) {
-      toast.error('Please connect your wallet first!');
+      toast.error('👛 Please connect your wallet first! Click the "Connect Wallet" button at the top.');
       return;
     }
 
@@ -207,7 +207,7 @@ function App() {
               <button 
                 className="mint-btn"
                 onClick={mintNFT}
-                disabled={isMinting || !isWalletConnected || !walletAddress}
+                disabled={isMinting}
               >
                 {isMinting ? (
                   <>
