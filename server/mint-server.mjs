@@ -133,7 +133,13 @@ app.post("/mint", async (req, res) => {
             
             // Clean up active mint tracking on error
             activeMints.delete(mintKey);
-            return res.status(500).json({ error: err.message, stderr });
+            return res.status(500).json({ 
+                error: err.message, 
+                stderr,
+                stdout: stdout || '',
+                combinedOutput: combinedOutput || '',
+                command: cmd
+            });
         }
         // Try to parse mint and signature from stdout
         const mintMatch = stdout.match(/Mint:\s+([A-Za-z0-9]+)/m);
