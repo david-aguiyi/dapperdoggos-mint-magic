@@ -2,10 +2,8 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-import { Connection, PublicKey, Keypair, Transaction } from "@solana/web3.js";
-import { Metaplex, keypairIdentity, bundlrStorage } from "@metaplex-foundation/js";
-import { mplCandyMachine, mintV2 } from "@metaplex-foundation/mpl-candy-machine";
-import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
+import { Connection, PublicKey, Keypair } from "@solana/web3.js";
+import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -113,11 +111,8 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
         
-        // Initialize Metaplex with all required plugins for CMv3
-        const metaplex = Metaplex.make(connection)
-            .use(keypairIdentity(authorityKeypair))
-            .use(mplCandyMachine())
-            .use(mplTokenMetadata());
+        // Initialize Metaplex
+        const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
         // Load candy machine
         const candyMachineAddress = new PublicKey(CANDY_MACHINE_ID);
@@ -139,39 +134,27 @@ app.post("/mint", async (req, res) => {
             });
         }
         
-        // Mint NFTs using MintV2
+        // Mint NFTs - use the standard mint with payer parameter
         const receiverPubkey = new PublicKey(wallet);
         const mintResults = [];
         
         for (let i = 0; i < quantity; i++) {
-            console.log(`🎨 Minting NFT ${i + 1}/${quantity} using MintV2...`);
+            console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Build MintV2 transaction
-            const mintBuilder = await mintV2(metaplex, {
-                candyMachine: candyMachine.address,
-                collectionMint: candyMachine.collectionMintAddress,
-                collectionUpdateAuthority: authorityKeypair.publicKey,
+            // Mint with payer specified (user pays, authority signs)
+            const { nft, response } = await metaplex.candyMachines().mint({
+                candyMachine,
+                owner: receiverPubkey,
                 payer: receiverPubkey,
-                minter: receiverPubkey,
             });
-            
-            // Build and send transaction
-            const { signature } = await metaplex
-                .rpc()
-                .sendAndConfirmTransaction(mintBuilder, {
-                    commitment: 'confirmed',
-                });
-            
-            // Get the minted NFT address (derive from signature or transaction)
-            const mintAddress = mintBuilder.getContext().mintSigner?.publicKey?.toString() || 'unknown';
             
             mintResults.push({
-                mint: mintAddress,
-                signature,
-                name: `DapperDoggo #${candyMachine.itemsMinted.toNumber() + i + 1}`,
+                mint: nft.address.toString(),
+                signature: response.signature,
+                name: nft.name,
             });
             
-            console.log(`✅ Minted NFT ${i + 1}: ${mintAddress}, Signature: ${signature}`);
+            console.log(`✅ Minted NFT ${i + 1}: ${nft.address.toString()}, Signature: ${response.signature}`);
         }
         
         // Clean up active mint tracking
