@@ -15,7 +15,7 @@ interface ToastItem {
   duration: number;
 }
 
-const Toast = ({ message, type = 'info', duration = 3000, onClose }: ToastProps) => {
+const Toast = ({ message, type = 'info', duration = 2000, onClose }: ToastProps) => {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }: ToastProps)
 
   const handleClose = () => {
     setIsClosing(true);
-    setTimeout(() => onClose && onClose(), 300); // Wait for slideOut animation
+    setTimeout(() => onClose && onClose(), 250); // Wait for slideOut animation
   };
 
   const getTypeClass = () => {
@@ -81,7 +81,7 @@ export const ToastContainer = ({ toasts, removeToast }: { toasts: ToastItem[], r
 export const useToast = () => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const addToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration = 3000) => {
+  const addToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration = 2000) => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message, type, duration }]);
   };

@@ -17,12 +17,12 @@
   backdrop-filter: blur(10px);
   min-width: 300px;
   max-width: 400px;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.25s ease-out;
   border-left: 4px solid;
 }
 
 .toast.toast-closing {
-  animation: slideOut 0.3s ease-in forwards;
+  animation: slideOut 0.25s ease-in forwards;
 }
 
 .toast-success {
