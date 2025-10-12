@@ -6,6 +6,26 @@ import fetch from "node-fetch";
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import fs from "fs";
+import path from "path";
+import os from "os";
+
+// Initialize Solana config for Sugar CLI
+const initSolanaConfig = () => {
+    const homeDir = os.homedir();
+    const configDir = path.join(homeDir, '.config', 'solana', 'cli');
+    const configFile = path.join(configDir, 'config.yml');
+    
+    if (!fs.existsSync(configFile)) {
+        console.log('Creating Solana CLI config...');
+        fs.mkdirSync(configDir, { recursive: true });
+        const configContent = `json_rpc_url: "${process.env.RPC_URL || 'https://api.mainnet-beta.solana.com'}"\nwebsocket_url: ""\nkeypair_path: ${process.env.SOL_KEYPAIR || '/etc/secrets/mainnet.json'}\naddress_labels:\n  "11111111111111111111111111111111": System Program\ncommitment: confirmed\n`;
+        fs.writeFileSync(configFile, configContent);
+        console.log('Solana config created at:', configFile);
+    }
+};
+
+// Initialize on startup
+initSolanaConfig();
 
 const app = express();
 app.use(cors());
