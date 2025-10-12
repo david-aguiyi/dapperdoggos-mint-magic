@@ -13,8 +13,14 @@ function App() {
   const [mintQuantity, setMintQuantity] = useState(1);
   const [isMinting, setIsMinting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successData, setSuccessData] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(true);
+  const [successData, setSuccessData] = useState({
+    mint: 'DemoMintAddress123456789',
+    signature: '5KjHK7VdJq8xYZ2rP9mN3wX4tQ1cR6sV8uB7gF9hD2eL3aM4nP5oT6rQ7sU8vW9x',
+    image: '/nfts/1.png',
+    wallet: 'YourWalletAddress123456',
+    quantity: 2
+  });
   
   const toast = useToast();
 
