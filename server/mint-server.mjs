@@ -63,7 +63,7 @@ app.post("/mint", async (req, res) => {
         const balanceInSol = balance / 1000000000; // Convert lamports to SOL
         
         // Calculate required amount (price + estimated gas fees)
-        const pricePerNft = 0.1; // SOL per NFT
+        const pricePerNft = 0.005; // SOL per NFT (TESTING PRICE)
         const estimatedGasFees = 0.01 * quantity; // ~0.01 SOL per NFT for gas
         const requiredAmount = (pricePerNft * quantity) + estimatedGasFees;
         
