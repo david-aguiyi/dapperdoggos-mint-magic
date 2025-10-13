@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import './Toast.css';
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface ToastProps {
   message: string;
   type?: 'info' | 'success' | 'error' | 'warning';
   duration?: number;
   onClose?: () => void;
+  action?: ToastAction;
 }
 
 interface ToastItem {
@@ -13,9 +19,10 @@ interface ToastItem {
   message: string;
   type: 'info' | 'success' | 'error' | 'warning';
   duration: number;
+  action?: ToastAction;
 }
 
-const Toast = ({ message, type = 'info', duration = 2000, onClose }: ToastProps) => {
+const Toast = ({ message, type = 'info', duration = 2000, onClose, action }: ToastProps) => {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
@@ -55,6 +62,14 @@ const Toast = ({ message, type = 'info', duration = 2000, onClose }: ToastProps)
     <div className={`toast ${getTypeClass()} ${isClosing ? 'toast-closing' : ''}`}>
       <span className="toast-icon">{getIcon()}</span>
       <span className="toast-message">{message}</span>
+      {action && (
+        <button 
+          className="toast-action" 
+          onClick={action.onClick}
+        >
+          {action.label}
+        </button>
+      )}
       <button className="toast-close" onClick={handleClose}>×</button>
     </div>
   );
@@ -71,6 +86,7 @@ export const ToastContainer = ({ toasts, removeToast }: { toasts: ToastItem[], r
           type={toast.type}
           duration={toast.duration}
           onClose={() => removeToast(toast.id)}
+          action={toast.action}
         />
       ))}
     </div>
@@ -81,9 +97,9 @@ export const ToastContainer = ({ toasts, removeToast }: { toasts: ToastItem[], r
 export const useToast = () => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const addToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration = 2000) => {
+  const addToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration = 2000, action?: ToastAction) => {
     const id = Date.now() + Math.random();
-    setToasts(prev => [...prev, { id, message, type, duration }]);
+    setToasts(prev => [...prev, { id, message, type, duration, action }]);
   };
 
   const removeToast = (id: number) => {
@@ -91,7 +107,7 @@ export const useToast = () => {
   };
 
   const success = (message: string, duration?: number) => addToast(message, 'success', duration);
-  const error = (message: string, duration?: number) => addToast(message, 'error', duration);
+  const error = (message: string, duration?: number, action?: ToastAction) => addToast(message, 'error', duration, action);
   const warning = (message: string, duration?: number) => addToast(message, 'warning', duration);
   const info = (message: string, duration?: number) => addToast(message, 'info', duration);
 

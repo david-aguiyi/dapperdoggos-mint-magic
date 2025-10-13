@@ -20,12 +20,78 @@ body {
   position: relative;
 }
 
+/* Mobile Wallet Banner */
+.mobile-wallet-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  padding: 12px 16px;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.banner-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.banner-text {
+  flex: 1;
+}
+
+.banner-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.banner-text p {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.banner-action-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Fredoka', 'Comic Sans MS', cursive;
+}
+
+.banner-action-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
 /* Wallet Button Container */
 .wallet-button-container {
   position: absolute;
   top: 20px;
   right: 40px;
   z-index: 1000;
+}
+
+/* Adjust wallet button position when mobile banner is shown */
+.mobile-wallet-banner ~ .wallet-button-container {
+  top: 80px;
 }
 
 .connect-wallet-btn {

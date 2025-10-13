@@ -14,6 +14,7 @@ function App() {
   const [isMinting, setIsMinting] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [successData, setSuccessData] = useState({
     mint: '',
     signature: '',
@@ -26,9 +27,10 @@ function App() {
 
   const API_BASE_URL = 'https://dapperdoggos-api.onrender.com';
 
-  // Fetch collection status
+  // Fetch collection status and detect mobile
   useEffect(() => {
     fetchCollectionStatus();
+    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
   }, []);
 
   const fetchCollectionStatus = async () => {
@@ -48,23 +50,81 @@ function App() {
     
     setIsConnecting(true);
     try {
-      // Check for Solana wallet providers (Phantom, Solflare, Backpack, etc.)
-      const provider = (window as any).solana || (window as any).phantom?.solana;
-      
-      if (provider) {
-        console.log('Wallet provider found:', provider);
-        const response = await provider.connect();
-        console.log('Wallet connected:', response.publicKey.toString());
-        setWalletAddress(response.publicKey.toString());
-        setIsWalletConnected(true);
-        toast.success('Wallet connected successfully!');
+      if (isMobile) {
+        // For mobile, try multiple wallet providers in order of preference
+        const mobileWallets = [
+          { name: 'Phantom', url: 'https://phantom.app/', provider: 'phantom' },
+          { name: 'Solflare', url: 'https://solflare.com/', provider: 'solflare' },
+          { name: 'Backpack', url: 'https://backpack.app/', provider: 'backpack' },
+          { name: 'Coinbase', url: 'https://www.coinbase.com/wallet', provider: 'coinbase' }
+        ];
+        
+        // Check if any wallet is already installed
+        let connected = false;
+        for (const wallet of mobileWallets) {
+          try {
+            let provider = null;
+            if (wallet.provider === 'phantom') {
+              provider = (window as any).phantom?.solana || (window as any).solana;
+            } else if (wallet.provider === 'solflare') {
+              provider = (window as any).solflare;
+            } else if (wallet.provider === 'backpack') {
+              provider = (window as any).backpack;
+            } else if (wallet.provider === 'coinbase') {
+              provider = (window as any).coinbase?.solana;
+            }
+            
+            if (provider && provider.connect) {
+              const response = await provider.connect();
+              console.log(`${wallet.name} wallet connected:`, response.publicKey.toString());
+              setWalletAddress(response.publicKey.toString());
+              setIsWalletConnected(true);
+              toast.success(`${wallet.name} wallet connected successfully!`);
+              connected = true;
+              break;
+            }
+          } catch (error) {
+            console.log(`${wallet.name} not available or failed to connect:`, error);
+            continue;
+          }
+        }
+        
+        if (!connected) {
+          // No wallet found, show mobile-friendly message
+          toast.error('No Solana wallet found on this device!', {
+            action: {
+              label: 'Install Phantom',
+              onClick: () => window.open('https://phantom.app/', '_blank')
+            }
+          });
+        }
       } else {
-        toast.error('Solana wallet not found! Please install Phantom, Solflare, or another Solana wallet.');
-        window.open('https://phantom.app/', '_blank');
+        // Desktop wallet connection
+        const provider = (window as any).solana || (window as any).phantom?.solana;
+        
+        if (provider && provider.connect) {
+          console.log('Wallet provider found:', provider);
+          const response = await provider.connect();
+          console.log('Wallet connected:', response.publicKey.toString());
+          setWalletAddress(response.publicKey.toString());
+          setIsWalletConnected(true);
+          toast.success('Wallet connected successfully!');
+        } else {
+          toast.error('Solana wallet not found! Please install Phantom or another Solana wallet.');
+          window.open('https://phantom.app/', '_blank');
+        }
       }
     } catch (error: any) {
       console.error('Error connecting wallet:', error);
-      toast.error(`Failed to connect wallet: ${error.message}`);
+      
+      // More specific error handling
+      if (error.code === 4001) {
+        toast.error('Wallet connection was rejected by user.');
+      } else if (error.message?.includes('User rejected')) {
+        toast.error('Wallet connection was rejected. Please try again.');
+      } else {
+        toast.error(`Failed to connect wallet: ${error.message || 'Unknown error'}`);
+      }
     } finally {
       setIsConnecting(false);
     }
@@ -135,6 +195,25 @@ function App() {
     <div className="app">
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       
+      {/* Mobile Wallet Banner */}
+      {isMobile && !isWalletConnected && (
+        <div className="mobile-wallet-banner">
+          <div className="banner-content">
+            <span className="banner-icon">📱</span>
+            <div className="banner-text">
+              <strong>Mobile Wallet Required</strong>
+              <p>Install Phantom or Solflare to mint NFTs on mobile</p>
+            </div>
+            <button 
+              className="banner-action-btn"
+              onClick={() => window.open('https://phantom.app/', '_blank')}
+            >
+              Install Phantom
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Connect Wallet Button */}
       <div className="wallet-button-container">
           <button 
