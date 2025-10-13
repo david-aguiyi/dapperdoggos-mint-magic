@@ -125,6 +125,30 @@ body {
   opacity: 0.8;
 }
 
+.connecting-spinner,
+.connected-indicator,
+.disconnected-indicator {
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.connecting-spinner {
+  animation: spin 1s linear infinite;
+}
+
+.connected-indicator {
+  color: #22c55e;
+}
+
+.disconnected-indicator {
+  color: #ef4444;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .connect-wallet-btn.connected {
   background: linear-gradient(135deg, #00D9A3 0%, #00B881 100%);
 }
