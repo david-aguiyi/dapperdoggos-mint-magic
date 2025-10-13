@@ -99,7 +99,7 @@ app.post("/mint", async (req, res) => {
         // Continue with mint if balance check fails (fallback)
     }
     
-    // Use Metaplex SDK for minting with Candy Machine v3 MintV2
+    // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
     try {
         console.log('🚀 Starting Metaplex SDK mint (CMv3 MintV2)...');
         
@@ -141,8 +141,8 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with payer specified (user pays, authority signs)
-            const { nft, response } = await metaplex.candyMachines().mint({
+            // Mint with MintV2 instruction (required for CMv3)
+            const { nft, response } = await metaplex.candyMachines().mintV2({
                 candyMachine,
                 owner: receiverPubkey,
                 payer: receiverPubkey,
