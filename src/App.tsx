@@ -50,128 +50,31 @@ function App() {
     
     setIsConnecting(true);
     try {
-      console.log('🔗 Starting wallet connection...');
-      console.log('📱 Mobile device:', isMobile);
-      console.log('🌐 User agent:', navigator.userAgent);
+      // Simple wallet connection - just like before
+      const provider = (window as any).solana || (window as any).phantom?.solana;
       
-      // Check for available wallet providers
-      const phantomProvider = (window as any).phantom?.solana || (window as any).solana;
-      const solflareProvider = (window as any).solflare;
-      const backpackProvider = (window as any).backpack;
-      const coinbaseProvider = (window as any).coinbase?.solana;
-      
-      console.log('💳 Available providers:', {
-        phantom: !!phantomProvider,
-        solflare: !!solflareProvider,
-        backpack: !!backpackProvider,
-        coinbase: !!coinbaseProvider
-      });
-      
-      // Try wallets in order of preference
-      const wallets = [
-        { name: 'Phantom', provider: phantomProvider, url: 'https://phantom.app/' },
-        { name: 'Solflare', provider: solflareProvider, url: 'https://solflare.com/' },
-        { name: 'Backpack', provider: backpackProvider, url: 'https://backpack.app/' },
-        { name: 'Coinbase', provider: coinbaseProvider, url: 'https://www.coinbase.com/wallet' }
-      ];
-      
-      let connected = false;
-      let lastError = null;
-      
-      for (const wallet of wallets) {
-        if (!wallet.provider) {
-          console.log(`❌ ${wallet.name} not available`);
-          continue;
-        }
-        
-        try {
-          console.log(`🔄 Trying to connect ${wallet.name}...`);
-          
-          // Check if wallet is already connected (Phantom specific)
-          if (wallet.provider.publicKey) {
-            console.log(`✅ ${wallet.name} already connected`);
-            const publicKey = wallet.provider.publicKey;
-            setWalletAddress(publicKey.toString());
-            setIsWalletConnected(true);
-            toast.success(`${wallet.name} wallet already connected!`);
-            connected = true;
-            break;
-          }
-          
-          // Attempt connection
-          const response = await wallet.provider.connect();
-          console.log(`✅ ${wallet.name} connected successfully:`, response.publicKey.toString());
-          
-          setWalletAddress(response.publicKey.toString());
-          setIsWalletConnected(true);
-          toast.success(`${wallet.name} wallet connected successfully!`);
-          connected = true;
-          break;
-          
-        } catch (error: any) {
-          console.error(`❌ ${wallet.name} connection failed:`, error);
-          lastError = error;
-          
-          // Handle specific error codes
-          if (error.code === 4001) {
-            console.log(`🚫 ${wallet.name} connection rejected by user`);
-            toast.error(`${wallet.name} connection was rejected. Please try again.`);
-            break; // Don't try other wallets if user rejected
-          } else if (error.code === 4100) {
-            console.log(`🔒 ${wallet.name} unauthorized`);
-            continue; // Try next wallet
-          } else if (error.code === 4900) {
-            console.log(`🔌 ${wallet.name} disconnected`);
-            continue; // Try next wallet
-          }
-          
-          // For other errors, try next wallet
-          continue;
-        }
+      if (provider && provider.connect) {
+        console.log('Wallet provider found:', provider);
+        const response = await provider.connect();
+        console.log('Wallet connected:', response.publicKey.toString());
+        setWalletAddress(response.publicKey.toString());
+        setIsWalletConnected(true);
+        toast.success('Wallet connected successfully!');
+      } else {
+        toast.error('Solana wallet not found! Please install Phantom or another Solana wallet.');
+        window.open('https://phantom.app/', '_blank');
       }
-      
-      if (!connected) {
-        console.error('❌ All wallet connections failed');
-        
-        if (lastError) {
-          console.error('Last error details:', lastError);
-          
-          // Provide specific error messages
-          if (lastError.code === 4001) {
-            toast.error('Wallet connection was rejected. Please try again.');
-          } else if (lastError.message?.includes('User rejected')) {
-            toast.error('Wallet connection was rejected. Please try again.');
-          } else if (lastError.message?.includes('0e')) {
-            toast.error('Wallet connection failed. Please try refreshing the page and connecting again.', {
-              action: {
-                label: 'Retry',
-                onClick: () => {
-                  setTimeout(() => connectWallet(), 1000);
-                }
-              }
-            });
-          } else {
-            toast.error(`Wallet connection failed: ${lastError.message || 'Unknown error'}`);
-          }
-        } else {
-          // No wallets available
-          if (isMobile) {
-            toast.error('No Solana wallet found on this device!', {
-              action: {
-                label: 'Install Phantom',
-                onClick: () => window.open('https://phantom.app/', '_blank')
-              }
-            });
-          } else {
-            toast.error('Solana wallet not found! Please install Phantom or another Solana wallet.');
-            window.open('https://phantom.app/', '_blank');
-          }
-        }
-      }
-      
     } catch (error: any) {
-      console.error('💥 Critical wallet connection error:', error);
-      toast.error(`Critical error: ${error.message || 'Please refresh the page and try again.'}`);
+      console.error('Error connecting wallet:', error);
+      
+      // Simple error handling
+      if (error.code === 4001) {
+        toast.error('Wallet connection was rejected by user.');
+      } else if (error.message?.includes('User rejected')) {
+        toast.error('Wallet connection was rejected. Please try again.');
+      } else {
+        toast.error(`Failed to connect wallet: ${error.message || 'Unknown error'}`);
+      }
     } finally {
       setIsConnecting(false);
     }
@@ -242,24 +145,6 @@ function App() {
     <div className="app">
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       
-      {/* Mobile Wallet Banner */}
-      {isMobile && !isWalletConnected && (
-        <div className="mobile-wallet-banner">
-          <div className="banner-content">
-            <span className="banner-icon">📱</span>
-            <div className="banner-text">
-              <strong>Mobile Wallet Required</strong>
-              <p>Install Phantom or Solflare to mint NFTs on mobile</p>
-            </div>
-            <button 
-              className="banner-action-btn"
-              onClick={() => window.open('https://phantom.app/', '_blank')}
-            >
-              Install Phantom
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Connect Wallet Button */}
       <div className="wallet-button-container">
@@ -269,22 +154,7 @@ function App() {
             disabled={isWalletConnected || isConnecting}
           >
           <i className="fa-solid fa-wallet wallet-icon"></i>
-            {isConnecting ? (
-              <>
-                <span className="connecting-spinner">⏳</span>
-                Connecting...
-              </>
-            ) : isWalletConnected ? (
-              <>
-                <span className="connected-indicator">✅</span>
-                {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
-              </>
-            ) : (
-              <>
-                <span className="disconnected-indicator">🔌</span>
-                Connect Wallet
-              </>
-            )}
+            {isConnecting ? 'Connecting...' : isWalletConnected ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}` : 'Connect Wallet'}
           </button>
         </div>
 
