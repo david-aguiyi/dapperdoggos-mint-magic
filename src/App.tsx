@@ -87,17 +87,15 @@ function App() {
         try {
           console.log(`🔄 Trying to connect ${wallet.name}...`);
           
-          // Check if wallet is already connected
-          if (wallet.provider.isConnected && wallet.provider.isConnected()) {
+          // Check if wallet is already connected (Phantom specific)
+          if (wallet.provider.publicKey) {
             console.log(`✅ ${wallet.name} already connected`);
             const publicKey = wallet.provider.publicKey;
-            if (publicKey) {
-              setWalletAddress(publicKey.toString());
-              setIsWalletConnected(true);
-              toast.success(`${wallet.name} wallet already connected!`);
-              connected = true;
-              break;
-            }
+            setWalletAddress(publicKey.toString());
+            setIsWalletConnected(true);
+            toast.success(`${wallet.name} wallet already connected!`);
+            connected = true;
+            break;
           }
           
           // Attempt connection
