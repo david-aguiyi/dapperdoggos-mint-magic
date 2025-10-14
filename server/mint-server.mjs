@@ -22,22 +22,11 @@ import os from "os";
 
 // Import the raw mint instruction builder (CommonJS compatibility)
 import * as mplCandyMachineCore from "@metaplex-foundation/mpl-candy-machine";
-const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard } = mplCandyMachineCore;
-// Token metadata imports (not directly used - Umi handles these internally)
-// import { 
-//     PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
-//     findMasterEditionPda,
-//     findMetadataPda
-// } from "@metaplex-foundation/mpl-token-metadata";
-// import {
-//     findAssociatedTokenPda,
-//     PROGRAM_ID as TOKEN_PROGRAM_ID,
-//     PROGRAM_ID as ASSOCIATED_TOKEN_PROGRAM_ID
-// } from "@metaplex-foundation/mpl-toolbox";
+const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard, mplCandyMachine } = mplCandyMachineCore;
+
+// Umi framework imports
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { publicKey, generateSigner, transactionBuilder, some, signerIdentity, createSignerFromKeypair } from "@metaplex-foundation/umi";
-// mplCandyMachine is already imported via namespace above
-const { mplCandyMachine } = mplCandyMachineCore;
 
 // Configuration
 const PORT = process.env.PORT || 3001;
