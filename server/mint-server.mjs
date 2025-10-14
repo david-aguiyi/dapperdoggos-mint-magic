@@ -22,7 +22,7 @@ import os from "os";
 
 // Import the raw mint instruction builder (CommonJS compatibility)
 import * as mplCandyMachineCore from "@metaplex-foundation/mpl-candy-machine";
-const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard, mplCandyMachine } = mplCandyMachineCore;
+const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard } = mplCandyMachineCore;
 
 // Umi framework imports
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -95,7 +95,7 @@ app.post("/mint", async (req, res) => {
     try {
         // Step 1: Initialize Umi (new Metaplex framework)
         console.log('\n1️⃣ Initializing Umi framework...');
-        const umi = createUmi(RPC).use(mplCandyMachine());
+        const umi = createUmi(RPC);
         
         // Load keypair
         const keypairData = JSON.parse(fs.readFileSync(KEYPAIR, "utf8"));
@@ -273,7 +273,7 @@ app.post("/mint", async (req, res) => {
  */
 app.get("/collection/status", async (req, res) => {
     try {
-        const umi = createUmi(RPC).use(mplCandyMachine());
+        const umi = createUmi(RPC);
         const candyMachinePublicKey = publicKey(CANDY_MACHINE_ID);
         const candyMachine = await safeFetchCandyMachine(umi, candyMachinePublicKey);
         
