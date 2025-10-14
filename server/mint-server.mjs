@@ -81,7 +81,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v8 - SKIP CANDY GUARD - USE SIMPLE MINT - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v9 - SMART GUARD DETECTION - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -119,42 +119,32 @@ app.post("/mint", async (req, res) => {
             console.log(`\n📦 Minting NFT ${i + 1}/${quantity}...`);
             
             try {
-                // Use Sugar CLI directly - this should work without Candy Guard issues
-                console.log('🎯 Using Sugar CLI for minting...');
+                // Use Metaplex SDK with proper Candy Guard handling
+                console.log('🎯 Using Metaplex SDK with Candy Guard...');
                 
-                const { exec } = await import('child_process');
-                const { promisify } = await import('util');
-                const execAsync = promisify(exec);
+                // Check if candy machine has a guard
+                const hasGuard = candyMachine.mintAuthority && candyMachine.mintAuthority.toString() !== candyMachine.authority.toString();
+                console.log('🛡️ Candy Machine has guard:', hasGuard);
                 
-                // Use Sugar to mint directly
-                const sugarCommand = `./sugar mint ${CANDY_MACHINE_ID} --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${receiverPubkey.toString()}`;
-                console.log('🍬 Running Sugar command:', sugarCommand);
+                let mintResult;
                 
-                const { stdout, stderr } = await execAsync(sugarCommand);
-                
-                console.log('🍬 Sugar output:', { stdout, stderr });
-                
-                if (stderr && !stderr.includes('success')) {
-                    throw new Error(`Sugar mint failed: ${stderr}`);
+                if (hasGuard) {
+                    // Use mintV2 for Candy Machine with Guard
+                    console.log('🎯 Using mintV2 for Candy Machine with Guard...');
+                    mintResult = await metaplex.candyMachines().mintV2({
+                        candyMachine,
+                        owner: receiverPubkey,
+                        payer: authorityKeypair.publicKey,
+                    });
+                } else {
+                    // Use standard mint for Candy Machine without Guard
+                    console.log('🎯 Using standard mint for Candy Machine without Guard...');
+                    mintResult = await metaplex.candyMachines().mint({
+                        candyMachine,
+                        owner: receiverPubkey,
+                        payer: authorityKeypair.publicKey,
+                    });
                 }
-                
-                // Parse the output to get mint address and signature
-                const mintMatch = stdout.match(/Mint address: ([A-Za-z0-9]{32,44})/);
-                const signatureMatch = stdout.match(/Signature: ([A-Za-z0-9]{64,88})/);
-                
-                if (!mintMatch || !signatureMatch) {
-                    throw new Error('Could not parse Sugar output for mint address and signature');
-                }
-                
-                const mintResult = {
-                    nft: {
-                        address: new PublicKey(mintMatch[1]),
-                        name: `DapperDoggo #${i + 1}`
-                    },
-                    response: {
-                        signature: signatureMatch[1]
-                    }
-                };
                 
                 console.log('🔍 Raw mint result:', mintResult);
                 console.log('🔍 Mint result type:', typeof mintResult);
