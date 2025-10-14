@@ -10,7 +10,7 @@ import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { createSignerFromKeypair, signerIdentity } from '@metaplex-foundation/umi';
-import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
+import { fetchCandyMachine, mintV2, mint } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
 import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
 import * as mplCandyMachineModule from '@metaplex-foundation/mpl-candy-machine';
@@ -87,7 +87,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v12 - UMI KEYPAIR SIGNER - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v13 - UMI MINT FALLBACK - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -163,18 +163,43 @@ app.post("/mint", async (req, res) => {
                 // Generate new NFT mint account
                 const nftMint = generateSigner(umi);
                 
-                // Build and send mint transaction with Umi
-                const tx = await transactionBuilder()
-                    .add(setComputeUnitLimit(umi, { units: 800_000 }))
-                    .add(
-                        mintV2(umi, {
-                            candyMachine: umiCandyMachine.publicKey,
-                            nftMint,
-                            collectionMint: umiCandyMachine.collectionMint,
-                            collectionUpdateAuthority: umiCandyMachine.authority,
-                        })
-                    )
-                    .sendAndConfirm(umi);
+                        // Try mintV2 first, fallback to mint if it fails
+                        let tx;
+                        try {
+                            // Try mintV2 (for Candy Machines with guards)
+                            console.log('🎯 Attempting mintV2 (with guard)...');
+                            tx = await transactionBuilder()
+                                .add(setComputeUnitLimit(umi, { units: 800_000 }))
+                                .add(
+                                    mintV2(umi, {
+                                        candyMachine: umiCandyMachine.publicKey,
+                                        nftMint,
+                                        collectionMint: umiCandyMachine.collectionMint,
+                                        collectionUpdateAuthority: umiCandyMachine.authority,
+                                    })
+                                )
+                                .sendAndConfirm(umi);
+                        } catch (mintV2Error) {
+                            if (mintV2Error.message?.includes('AccountNotInitialized') || 
+                                mintV2Error.message?.includes('0xbc4')) {
+                                console.log('⚠️ mintV2 failed (no guard), trying standard mint...');
+                                
+                                // Fallback to standard mint (for Candy Machines without guards)
+                                tx = await transactionBuilder()
+                                    .add(setComputeUnitLimit(umi, { units: 800_000 }))
+                                    .add(
+                                        mint(umi, {
+                                            candyMachine: umiCandyMachine.publicKey,
+                                            nftMint,
+                                            collectionMint: umiCandyMachine.collectionMint,
+                                            collectionUpdateAuthority: umiCandyMachine.authority,
+                                        })
+                                    )
+                                    .sendAndConfirm(umi);
+                            } else {
+                                throw mintV2Error;
+                            }
+                        }
                 
                 console.log('✅ Umi mint successful!');
                 console.log('📝 Signature:', tx.signature);
