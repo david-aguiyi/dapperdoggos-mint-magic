@@ -141,13 +141,10 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with user as payer and owner (user pays and gets NFT)
+            // Mint with simplified parameters - let Metaplex handle account setup
             const { nft, response } = await metaplex.candyMachines().mint({
                 candyMachine,
                 owner: receiverPubkey,
-                payer: receiverPubkey,
-                // Use the public guard group for CMv3
-                group: "public",
             });
             
             mintResults.push({
