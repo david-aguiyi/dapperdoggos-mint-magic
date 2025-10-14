@@ -101,7 +101,7 @@ app.post("/mint", async (req, res) => {
     
     // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
     try {
-        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - TRANSACTION FIX...');
+        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - INSTRUCTION BUILDER...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
@@ -141,10 +141,15 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with simplified parameters - let Metaplex handle account setup
-            const { nft, response } = await metaplex.candyMachines().mint({
+            // Use direct instruction builder to avoid high-level SDK issues
+            const mintBuilder = await metaplex.candyMachines().builders().mint({
                 candyMachine,
                 owner: receiverPubkey,
+            });
+            
+            const { response } = await mintBuilder.sendAndConfirm(metaplex);
+            const nft = await metaplex.nfts().findByMint({
+                mintAddress: mintBuilder.getMintAddress(),
             });
             
             mintResults.push({
