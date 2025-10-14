@@ -203,13 +203,22 @@ app.post("/mint", async (req, res) => {
                 confirm: { commitment: 'confirmed' },
             });
 
-            const signature = result.signature;
+            // Convert signature from Umi format (Uint8Array) to base58 string
+            const signature = typeof result.signature === 'string' 
+                ? result.signature 
+                : Buffer.from(result.signature).toString('base64');
+            
             console.log(`      ✅ NFT ${i + 1} minted successfully!`);
             console.log(`         Mint Address: ${nftMint.publicKey}`);
             console.log(`         Signature: ${signature}`);
 
+            // Store mint result with proper string conversions
+            const mintAddress = typeof nftMint.publicKey === 'string' 
+                ? nftMint.publicKey 
+                : nftMint.publicKey.toString();
+            
             mintResults.push({
-                mint: nftMint.publicKey.toString(),
+                mint: mintAddress,
                 signature: signature,
                 name: `DapperDoggo #${candyMachine.itemsRedeemed + BigInt(i + 1)}`,
             });
