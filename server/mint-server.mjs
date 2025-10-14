@@ -20,12 +20,9 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
-// Import the raw mint instruction builder
-import { 
-    mintV2,
-    safeFetchCandyMachine,
-    safeFetchCandyGuard
-} from "@metaplex-foundation/mpl-candy-machine";
+// Import the raw mint instruction builder (CommonJS compatibility)
+import * as mplCandyMachineCore from "@metaplex-foundation/mpl-candy-machine";
+const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard } = mplCandyMachineCore;
 // Token metadata imports (not directly used - Umi handles these internally)
 // import { 
 //     PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
