@@ -117,17 +117,130 @@ function App() {
       // Show user what they'll pay
       toast.info(`💰 You will pay: ${(mintQuantity * 0.1).toFixed(1)} SOL for ${mintQuantity} NFT(s) + transaction fees`);
       
-      // For now, simulate the minting process
-      // In a real implementation, this would create and sign a transaction with the Candy Machine
-      toast.success(`✅ USER-PAYS system ready! You have sufficient balance.`);
-      toast.info('🚧 Full minting implementation coming next...');
+      // REAL MINTING - Create actual NFTs!
+      console.log('🎯 Starting REAL minting with user wallet...');
       
-      // Simulate successful minting for demo
-      setTimeout(() => {
-        toast.success(`🎉 Would successfully mint ${mintQuantity} NFT(s) for ${(mintQuantity * 0.1).toFixed(1)} SOL!`);
-        fetchCollectionStatus();
-        setShowSuccessModal(true);
-      }, 2000);
+      // Import Umi modules dynamically
+      const { createUmi } = await import('@metaplex-foundation/umi-bundle-defaults');
+      const { fetchCandyMachine, mintV2, mint } = await import('@metaplex-foundation/mpl-candy-machine');
+      const { setComputeUnitLimit } = await import('@metaplex-foundation/mpl-toolbox');
+      const { transactionBuilder, publicKey as umiPublicKey, generateSigner } = await import('@metaplex-foundation/umi');
+      
+      // Create Umi instance
+      const umi = createUmi('https://rpc.helius.xyz/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20');
+      
+      // Set user's wallet as the identity (they sign and pay)
+      umi.identity = {
+        publicKey: umiPublicKey(walletAddress),
+        signMessage: async (message) => {
+          const signature = await provider.signMessage(message);
+          return signature.signature;
+        },
+        signTransaction: async (transaction) => {
+          const signed = await provider.signTransaction(transaction);
+          return signed;
+        },
+        signAllTransactions: async (transactions) => {
+          const signed = await provider.signAllTransactions(transactions);
+          return signed;
+        }
+      };
+      
+      // Register Candy Machine program
+      const { mplCandyMachine } = await import('@metaplex-foundation/mpl-candy-machine');
+      umi.use(mplCandyMachine());
+      
+      // Fetch Candy Machine
+      const candyMachineAddress = umiPublicKey('4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt');
+      const candyMachine = await fetchCandyMachine(umi, candyMachineAddress);
+      
+      console.log('🍬 Candy Machine loaded:', {
+        address: candyMachine.publicKey,
+        itemsRedeemed: candyMachine.itemsRedeemed.toString(),
+        itemsAvailable: candyMachine.data.itemsAvailable.toString(),
+      });
+      
+      // Check if sold out
+      const remaining = candyMachine.data.itemsAvailable.toNumber() - candyMachine.itemsRedeemed.toNumber();
+      if (remaining < mintQuantity) {
+        toast.error(`🚫 Not enough NFTs available! Only ${remaining} remaining.`);
+        return;
+      }
+      
+      // Mint NFTs
+      const mintResults = [];
+      
+      for (let i = 0; i < mintQuantity; i++) {
+        console.log(`📦 Minting NFT ${i + 1}/${mintQuantity}...`);
+        
+        // Generate new NFT mint account
+        const nftMint = generateSigner(umi);
+        
+        try {
+          // Try mintV2 first, fallback to mint if it fails
+          let tx;
+          try {
+            console.log('🎯 Attempting mintV2 (with guard)...');
+            tx = await transactionBuilder()
+              .add(setComputeUnitLimit(umi, { units: 800_000 }))
+              .add(
+                mintV2(umi, {
+                  candyMachine: candyMachine.publicKey,
+                  nftMint,
+                  collectionMint: candyMachine.collectionMint,
+                  collectionUpdateAuthority: candyMachine.authority,
+                })
+              )
+              .sendAndConfirm(umi);
+          } catch (mintV2Error) {
+            console.log('⚠️ mintV2 failed:', mintV2Error.message);
+            console.log('🔄 Falling back to standard mint...');
+            
+            // Fallback to standard mint
+            tx = await transactionBuilder()
+              .add(setComputeUnitLimit(umi, { units: 800_000 }))
+              .add(
+                mint(umi, {
+                  candyMachine: candyMachine.publicKey,
+                  nftMint,
+                  collectionMint: candyMachine.collectionMint,
+                  collectionUpdateAuthority: candyMachine.authority,
+                })
+              )
+              .sendAndConfirm(umi);
+          }
+          
+          console.log(`✅ Successfully minted NFT ${i + 1}!`);
+          console.log('📝 Transaction signature:', tx.signature);
+          
+          mintResults.push({
+            mint: nftMint.publicKey,
+            signature: tx.signature,
+            name: `DapperDoggo #${candyMachine.itemsRedeemed.toNumber() + i + 1}`
+          });
+          
+        } catch (mintError) {
+          console.error(`❌ Failed to mint NFT ${i + 1}:`, mintError);
+          throw new Error(`Failed to mint NFT ${i + 1}: ${mintError.message}`);
+        }
+      }
+      
+      // Success!
+      console.log('🎉 ALL NFTS MINTED SUCCESSFULLY!');
+      toast.success(`🎉 Successfully minted ${mintQuantity} NFT(s)! Check your wallet.`);
+      
+      // Update collection status
+      fetchCollectionStatus();
+      
+      // Show success modal
+      setSuccessData({
+        mint: mintResults[0].mint.toString(),
+        signature: mintResults[0].signature.toString(),
+        image: '/nfts/1.png', // Default image
+        wallet: walletAddress,
+        quantity: mintQuantity
+      });
+      setShowSuccessModal(true);
 
     } catch (error: any) {
       console.error('❌ Minting error:', error);
