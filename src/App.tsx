@@ -125,7 +125,7 @@ function App() {
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
       // Using Helius RPC with your free API key (100k requests/day)
-      const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20';
+      const RPC_URL = 'https://rpc.helius.xyz/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20';
       
       const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
       
