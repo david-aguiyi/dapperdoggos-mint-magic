@@ -99,9 +99,9 @@ app.post("/mint", async (req, res) => {
         // Continue with mint if balance check fails (fallback)
     }
     
-    // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
+    // Try Metaplex with minimal parameters and better debugging
     try {
-        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - INSTRUCTION BUILDER...');
+        console.log('🚀 Starting Metaplex mint (CMv3) - MINIMAL DEBUG APPROACH...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
@@ -122,6 +122,8 @@ app.post("/mint", async (req, res) => {
             address: candyMachine.address.toBase58(),
             itemsAvailable: candyMachine.itemsAvailable.toString(),
             itemsMinted: candyMachine.itemsMinted.toString(),
+            version: candyMachine.version,
+            guards: candyMachine.candyGuard?.guards
         });
         
         // Check if sold out
@@ -134,32 +136,25 @@ app.post("/mint", async (req, res) => {
             });
         }
         
-        // Mint NFTs - properly structure the transaction
+        // Mint with absolute minimal parameters
         const receiverPubkey = new PublicKey(wallet);
-        const mintResults = [];
+        console.log('🎯 Minting to wallet:', receiverPubkey.toString());
         
-        for (let i = 0; i < quantity; i++) {
-            console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
-            
-            // Use direct instruction builder to avoid high-level SDK issues
-            const mintBuilder = await metaplex.candyMachines().builders().mint({
-                candyMachine,
-                owner: receiverPubkey,
-            });
-            
-            const { response } = await mintBuilder.sendAndConfirm(metaplex);
-            const nft = await metaplex.nfts().findByMint({
-                mintAddress: mintBuilder.getMintAddress(),
-            });
-            
-            mintResults.push({
-                mint: nft.address.toString(),
-                signature: response.signature,
-                name: nft.name,
-            });
-            
-            console.log(`✅ Minted NFT ${i + 1}: ${nft.address.toString()}, Signature: ${response.signature}`);
-        }
+        // Try the most basic mint call possible
+        const { nft, response } = await metaplex.candyMachines().mint({
+            candyMachine
+        });
+        
+        console.log('✅ Mint successful:', {
+            nftAddress: nft.address.toString(),
+            signature: response.signature
+        });
+        
+        const mintResults = [{
+            mint: nft.address.toString(),
+            signature: response.signature,
+            name: nft.name,
+        }];
         
         // Clean up active mint tracking
         activeMints.delete(mintKey);
