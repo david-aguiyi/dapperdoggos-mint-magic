@@ -87,7 +87,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v13 - UMI MINT FALLBACK - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v14 - UNIVERSAL MINT FALLBACK - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -180,25 +180,21 @@ app.post("/mint", async (req, res) => {
                                 )
                                 .sendAndConfirm(umi);
                         } catch (mintV2Error) {
-                            if (mintV2Error.message?.includes('AccountNotInitialized') || 
-                                mintV2Error.message?.includes('0xbc4')) {
-                                console.log('⚠️ mintV2 failed (no guard), trying standard mint...');
-                                
-                                // Fallback to standard mint (for Candy Machines without guards)
-                                tx = await transactionBuilder()
-                                    .add(setComputeUnitLimit(umi, { units: 800_000 }))
-                                    .add(
-                                        mint(umi, {
-                                            candyMachine: umiCandyMachine.publicKey,
-                                            nftMint,
-                                            collectionMint: umiCandyMachine.collectionMint,
-                                            collectionUpdateAuthority: umiCandyMachine.authority,
-                                        })
-                                    )
-                                    .sendAndConfirm(umi);
-                            } else {
-                                throw mintV2Error;
-                            }
+                            console.log('⚠️ mintV2 failed:', mintV2Error.message);
+                            console.log('🔄 Falling back to standard mint (no guard required)...');
+                            
+                            // Fallback to standard mint for ANY mintV2 failure
+                            tx = await transactionBuilder()
+                                .add(setComputeUnitLimit(umi, { units: 800_000 }))
+                                .add(
+                                    mint(umi, {
+                                        candyMachine: umiCandyMachine.publicKey,
+                                        nftMint,
+                                        collectionMint: umiCandyMachine.collectionMint,
+                                        collectionUpdateAuthority: umiCandyMachine.authority,
+                                    })
+                                )
+                                .sendAndConfirm(umi);
                         }
                 
                 console.log('✅ Umi mint successful!');

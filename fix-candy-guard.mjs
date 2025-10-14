@@ -11,7 +11,7 @@
 
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-// import { keypairIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
+import { keypairIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import * as mplCandyMachine from '@metaplex-foundation/mpl-candy-machine';
 import { publicKey as umiPublicKey } from '@metaplex-foundation/umi';
 import fs from 'fs';
