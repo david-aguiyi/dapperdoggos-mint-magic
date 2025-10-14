@@ -54,14 +54,20 @@ app.post("/mint", async (req, res) => {
         });
     }
 
-    const mintKey = `${wallet}-${Date.now()}`;
-    if (activeMints.has(wallet)) {
+    const mintKey = `${wallet}-${quantity}`;
+    if (activeMints.has(mintKey)) {
         return res.status(429).json({ 
             error: "Rate Limited",
             message: "Please wait before minting again"
         });
     }
-    activeMints.set(wallet, mintKey);
+    activeMints.set(mintKey, Date.now());
+    
+    // Clean up after 30 seconds (much shorter timeout)
+    setTimeout(() => {
+        activeMints.delete(mintKey);
+        console.log(`🧹 Cleaned up rate limit for ${mintKey}`);
+    }, 30000);
 
     console.log('\n🚀 ========================================');
     console.log('SIMPLE SDK: Metaplex JS (CM without Guard)');
@@ -75,7 +81,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v6 - TRY MINTV2 + EXPLICIT PAYER - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v7 - FIX RATE LIMITING - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -94,7 +100,7 @@ app.post("/mint", async (req, res) => {
         // Check if sold out
         const remaining = candyMachine.itemsAvailable.toNumber() - candyMachine.itemsMinted.toNumber();
         if (remaining < quantity) {
-            activeMints.delete(wallet);
+            activeMints.delete(mintKey);
             return res.status(400).json({ 
                 error: "Not enough NFTs available",
                 message: `Only ${remaining} NFT(s) remaining`,
