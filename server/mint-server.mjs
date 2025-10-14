@@ -37,7 +37,7 @@ import {
     PROGRAM_ID as ASSOCIATED_TOKEN_PROGRAM_ID
 } from "@metaplex-foundation/mpl-toolbox";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { publicKey, generateSigner, transactionBuilder, some } from "@metaplex-foundation/umi";
+import { publicKey, generateSigner, transactionBuilder, some, signerIdentity, createSignerFromKeypair } from "@metaplex-foundation/umi";
 import { mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
 
 // Configuration
@@ -114,18 +114,10 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         console.log('   🔑 Authority wallet:', authorityKeypair.publicKey.toString());
         
-        // Convert to Umi keypair
+        // Convert to Umi keypair and set as identity (proper way)
         const umiKeypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(keypairData));
-        umi.use({
-            install(umi) {
-                umi.identity = {
-                    ...umiKeypair,
-                    signMessage: async (message) => umiKeypair.secretKey,
-                    signTransaction: async (transaction) => transaction,
-                    signAllTransactions: async (transactions) => transactions,
-                };
-            }
-        });
+        const umiSigner = createSignerFromKeypair(umi, umiKeypair);
+        umi.use(signerIdentity(umiSigner));
         
         console.log('   ✅ Umi initialized with authority identity');
 
