@@ -9,7 +9,7 @@ import cors from "cors";
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { signerIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
+import { createSignerFromKeypair, signerIdentity } from '@metaplex-foundation/umi';
 import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
 import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
@@ -87,7 +87,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v11 - FIX UMI SIGNER - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v12 - UMI KEYPAIR SIGNER - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -131,26 +131,16 @@ app.post("/mint", async (req, res) => {
                 // Create Umi instance with proper signer
                 const umi = createUmi(RPC);
                 
-                // Create a proper signer from the keypair
-                const authoritySigner = {
+                // Convert Solana keypair to Umi keypair format
+                const umiKeypair = {
                     publicKey: umiPublicKey(authorityKeypair.publicKey.toString()),
-                    signMessage: async (message) => {
-                        // Sign the message with the keypair
-                        return authorityKeypair.secretKey;
-                    },
-                    signTransaction: async (transaction) => {
-                        // Sign the transaction with the keypair
-                        transaction.sign(authorityKeypair);
-                        return transaction;
-                    },
-                    signAllTransactions: async (transactions) => {
-                        // Sign all transactions with the keypair
-                        transactions.forEach(tx => tx.sign(authorityKeypair));
-                        return transactions;
-                    }
+                    secretKey: authorityKeypair.secretKey
                 };
                 
-                // Use the proper signerIdentity method
+                // Create a signer from the keypair
+                const authoritySigner = createSignerFromKeypair(umi, umiKeypair);
+                
+                // Set as the identity signer
                 umi.use(signerIdentity(authoritySigner));
                 
                 // Register Candy Machine program
