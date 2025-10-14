@@ -101,7 +101,7 @@ app.post("/mint", async (req, res) => {
     
     // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
     try {
-        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - FIXED VERSION...');
+        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - FORCE DEPLOY v2...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
