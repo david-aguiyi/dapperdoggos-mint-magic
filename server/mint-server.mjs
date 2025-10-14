@@ -101,7 +101,7 @@ app.post("/mint", async (req, res) => {
     
     // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
     try {
-        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - FORCE DEPLOY v2...');
+        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - TRANSACTION FIX...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
@@ -111,7 +111,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
         
-        // Initialize Metaplex
+        // Initialize Metaplex with authority identity
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
         // Load candy machine
@@ -134,18 +134,20 @@ app.post("/mint", async (req, res) => {
             });
         }
         
-        // Mint NFTs - use the standard mint with payer parameter
+        // Mint NFTs - properly structure the transaction
         const receiverPubkey = new PublicKey(wallet);
         const mintResults = [];
         
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with standard mint method (works with CMv3)
+            // Mint with user as payer and owner (user pays and gets NFT)
             const { nft, response } = await metaplex.candyMachines().mint({
                 candyMachine,
                 owner: receiverPubkey,
                 payer: receiverPubkey,
+                // Use the public guard group for CMv3
+                group: "public",
             });
             
             mintResults.push({
