@@ -6,4 +6,4 @@ echo "ℹ️ Using Metaplex SDK (no Sugar CLI needed)"
 
 # Start the Node.js server
 echo "🌟 Starting Mint API server..."
-node server/mint-server.mjs
+node server/mint-server-metaplex-only.mjs
