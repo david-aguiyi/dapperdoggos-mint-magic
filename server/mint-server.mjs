@@ -14,7 +14,7 @@
 
 import express from "express";
 import cors from "cors";
-import { Connection, PublicKey, Keypair, Transaction, SystemProgram, SYSVAR_INSTRUCTIONS_PUBKEY } from "@solana/web3.js";
+import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import fs from "fs";
 import path from "path";
@@ -26,16 +26,17 @@ import {
     safeFetchCandyMachine,
     safeFetchCandyGuard
 } from "@metaplex-foundation/mpl-candy-machine";
-import { 
-    PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
-    findMasterEditionPda,
-    findMetadataPda
-} from "@metaplex-foundation/mpl-token-metadata";
-import {
-    findAssociatedTokenPda,
-    PROGRAM_ID as TOKEN_PROGRAM_ID,
-    PROGRAM_ID as ASSOCIATED_TOKEN_PROGRAM_ID
-} from "@metaplex-foundation/mpl-toolbox";
+// Token metadata imports (not directly used - Umi handles these internally)
+// import { 
+//     PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
+//     findMasterEditionPda,
+//     findMetadataPda
+// } from "@metaplex-foundation/mpl-token-metadata";
+// import {
+//     findAssociatedTokenPda,
+//     PROGRAM_ID as TOKEN_PROGRAM_ID,
+//     PROGRAM_ID as ASSOCIATED_TOKEN_PROGRAM_ID
+// } from "@metaplex-foundation/mpl-toolbox";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { publicKey, generateSigner, transactionBuilder, some, signerIdentity, createSignerFromKeypair } from "@metaplex-foundation/umi";
 import { mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
@@ -76,11 +77,11 @@ initSolanaConfig();
  */
 app.post("/mint", async (req, res) => {
     const { wallet, quantity = 1 } = req.body;
-
+    
     if (!wallet) {
         return res.status(400).json({ error: "Wallet address is required" });
     }
-
+    
     // Validate quantity
     if (quantity < 1 || quantity > 5) {
         return res.status(400).json({ 
@@ -227,16 +228,16 @@ app.post("/mint", async (req, res) => {
         // Step 5: Fetch NFT metadata for first minted NFT
         console.log('\n5️⃣ Fetching NFT metadata...');
         let image = null;
-        try {
+            try {
             // Use original Metaplex SDK to fetch metadata (it's good at this part)
-            const connection = new Connection(RPC, "confirmed");
+                const connection = new Connection(RPC, "confirmed");
             const metaplex = Metaplex.make(connection);
             const nft = await metaplex.nfts().findByMint({ 
                 mintAddress: new PublicKey(mintResults[0].mint) 
             });
             
             if (nft?.json?.image) {
-                image = nft.json.image;
+                        image = nft.json.image;
                 console.log('   ✅ Image URL:', image);
             }
         } catch (metadataError) {
@@ -252,7 +253,7 @@ app.post("/mint", async (req, res) => {
 
         // Return success response
         res.status(200).json({
-            success: true,
+                success: true, 
             message: `Successfully minted ${quantity} NFT(s) using raw instructions!`,
             mint: mintResults[0].mint,
             signature: mintResults[0].signature,
@@ -272,7 +273,7 @@ app.post("/mint", async (req, res) => {
 
         activeMints.delete(wallet);
 
-        res.status(500).json({
+            res.status(500).json({ 
             error: 'Mint Failed',
             message: error.message,
             details: error.toString()
