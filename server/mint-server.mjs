@@ -98,7 +98,7 @@ app.post("/mint", async (req, res) => {
             console.log('💡 Consider adding more SOL to the authority wallet');
         }
         
-        console.log('🚀 FORCE DEPLOY v15 - BALANCE CHECK & ERROR HANDLING - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v16 - STANDARD MINT ONLY - NO GUARD - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
