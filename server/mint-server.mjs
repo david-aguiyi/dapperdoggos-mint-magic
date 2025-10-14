@@ -8,6 +8,11 @@ import express from "express";
 import cors from "cors";
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
+import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
+import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
+import * as mplCandyMachineModule from '@metaplex-foundation/mpl-candy-machine';
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -81,7 +86,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v9 - SMART GUARD DETECTION - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v10 - UMI FRAMEWORK IN BACKEND - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -119,32 +124,73 @@ app.post("/mint", async (req, res) => {
             console.log(`\n📦 Minting NFT ${i + 1}/${quantity}...`);
             
             try {
-                // Use Metaplex SDK with proper Candy Guard handling
-                console.log('🎯 Using Metaplex SDK with Candy Guard...');
+                // Use Umi framework - this should work without undefined account issues
+                console.log('🎯 Using Umi framework for minting...');
                 
-                // Check if candy machine has a guard
-                const hasGuard = candyMachine.mintAuthority && candyMachine.mintAuthority.toString() !== candyMachine.authority.toString();
-                console.log('🛡️ Candy Machine has guard:', hasGuard);
+                // Create Umi instance with authority keypair
+                const umi = createUmi(RPC);
                 
-                let mintResult;
+                // Create authority identity from keypair
+                const authorityIdentity = {
+                    publicKey: umiPublicKey(authorityKeypair.publicKey.toString()),
+                    signMessage: async (message) => authorityKeypair.secretKey,
+                    signTransaction: async (transaction) => {
+                        transaction.sign(authorityKeypair);
+                        return transaction;
+                    },
+                    signAllTransactions: async (transactions) => {
+                        transactions.forEach(tx => tx.sign(authorityKeypair));
+                        return transactions;
+                    }
+                };
                 
-                if (hasGuard) {
-                    // Use mintV2 for Candy Machine with Guard
-                    console.log('🎯 Using mintV2 for Candy Machine with Guard...');
-                    mintResult = await metaplex.candyMachines().mintV2({
-                        candyMachine,
-                        owner: receiverPubkey,
-                        payer: authorityKeypair.publicKey,
-                    });
-                } else {
-                    // Use standard mint for Candy Machine without Guard
-                    console.log('🎯 Using standard mint for Candy Machine without Guard...');
-                    mintResult = await metaplex.candyMachines().mint({
-                        candyMachine,
-                        owner: receiverPubkey,
-                        payer: authorityKeypair.publicKey,
-                    });
+                umi.identity = authorityIdentity;
+                
+                // Register Candy Machine program
+                const { mplCandyMachine } = mplCandyMachineModule;
+                if (typeof mplCandyMachine === 'function') {
+                    umi.use(mplCandyMachine());
+                    console.log('✅ Candy Machine program registered');
                 }
+                
+                // Fetch Candy Machine with Umi
+                const candyMachineAddress = umiPublicKey(CANDY_MACHINE_ID);
+                const umiCandyMachine = await fetchCandyMachine(umi, candyMachineAddress);
+                
+                console.log('🍬 Umi Candy Machine loaded:', {
+                    address: umiCandyMachine.publicKey,
+                    itemsRedeemed: umiCandyMachine.itemsRedeemed.toString(),
+                    itemsAvailable: umiCandyMachine.data.itemsAvailable.toString(),
+                });
+                
+                // Generate new NFT mint account
+                const nftMint = generateSigner(umi);
+                
+                // Build and send mint transaction with Umi
+                const tx = await transactionBuilder()
+                    .add(setComputeUnitLimit(umi, { units: 800_000 }))
+                    .add(
+                        mintV2(umi, {
+                            candyMachine: umiCandyMachine.publicKey,
+                            nftMint,
+                            collectionMint: umiCandyMachine.collectionMint,
+                            collectionUpdateAuthority: umiCandyMachine.authority,
+                        })
+                    )
+                    .sendAndConfirm(umi);
+                
+                console.log('✅ Umi mint successful!');
+                console.log('📝 Signature:', tx.signature);
+                
+                const mintResult = {
+                    nft: {
+                        address: nftMint.publicKey,
+                        name: `DapperDoggo #${i + 1}`
+                    },
+                    response: {
+                        signature: tx.signature
+                    }
+                };
                 
                 console.log('🔍 Raw mint result:', mintResult);
                 console.log('🔍 Mint result type:', typeof mintResult);
