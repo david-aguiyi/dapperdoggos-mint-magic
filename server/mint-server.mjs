@@ -147,15 +147,26 @@ app.post("/mint", async (req, res) => {
         // Step 3: Fetch Candy Guard (if exists)
         console.log('\n3️⃣ Fetching Candy Guard...');
         let candyGuard = null;
+        let candyGuardAddress = null;
+        
         if (candyMachine.mintAuthority.__kind === 'Some') {
-            const guardAddress = candyMachine.mintAuthority.value;
-            candyGuard = await safeFetchCandyGuard(umi, guardAddress);
-            console.log('   ✅ Candy Guard loaded:', {
-                address: guardAddress,
-                guards: candyGuard?.guards
-            });
+            candyGuardAddress = candyMachine.mintAuthority.value;
+            console.log('   📍 Candy Guard address:', candyGuardAddress);
+            
+            try {
+                candyGuard = await safeFetchCandyGuard(umi, candyGuardAddress);
+                if (candyGuard) {
+                    console.log('   ✅ Candy Guard loaded successfully');
+                    console.log('   🛡️ Guards:', candyGuard.guards);
+                } else {
+                    console.log('   ⚠️ Candy Guard fetch returned null');
+                }
+            } catch (guardError) {
+                console.error('   ❌ Error fetching Candy Guard:', guardError.message);
+                console.log('   ℹ️ Will proceed without Candy Guard');
+            }
         } else {
-            console.log('   ℹ️ No Candy Guard configured');
+            console.log('   ℹ️ No Candy Guard configured (mint authority is not set)');
         }
 
         // Step 4: Build mint transaction using raw instructions
@@ -174,22 +185,28 @@ app.post("/mint", async (req, res) => {
             console.log(`      🆕 New NFT mint address: ${nftMint.publicKey}`);
 
             // Build the mint instruction
-            let mintBuilder = transactionBuilder()
-                .add(
-                    mintV2(umi, {
-                        candyMachine: candyMachine.publicKey,
-                        candyGuard: candyGuard?.publicKey,
-                        nftMint,
-                        collectionMint: candyMachine.collectionMint,
-                        collectionUpdateAuthority: candyMachine.authority,
-                        minter: receiverPublicKey,
-                        // Umi automatically derives these accounts:
-                        // - metadata PDA
-                        // - master edition PDA
-                        // - token account
-                        // - associated token account
-                    })
-                );
+            const mintParams = {
+                candyMachine: candyMachine.publicKey,
+                nftMint,
+                collectionMint: candyMachine.collectionMint,
+                collectionUpdateAuthority: candyMachine.authority,
+                minter: receiverPublicKey,
+                // Umi automatically derives these accounts:
+                // - metadata PDA
+                // - master edition PDA
+                // - token account
+                // - associated token account
+            };
+            
+            // Only add candyGuard if it exists and is initialized
+            if (candyGuard && candyGuard.publicKey) {
+                mintParams.candyGuard = candyGuard.publicKey;
+                console.log(`      🛡️ Using Candy Guard: ${candyGuard.publicKey}`);
+            } else {
+                console.log(`      ℹ️ No Candy Guard - minting without guards`);
+            }
+            
+            let mintBuilder = transactionBuilder().add(mintV2(umi, mintParams));
 
             // Send and confirm transaction
             console.log('      📤 Sending transaction...');
