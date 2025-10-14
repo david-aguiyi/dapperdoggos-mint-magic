@@ -174,39 +174,19 @@ app.post("/mint", async (req, res) => {
                 // Generate new NFT mint account
                 const nftMint = generateSigner(umi);
                 
-                        // Try mintV2 first, fallback to mint if it fails
-                        let tx;
-                        try {
-                            // Try mintV2 (for Candy Machines with guards)
-                            console.log('🎯 Attempting mintV2 (with guard)...');
-                            tx = await transactionBuilder()
-                                .add(setComputeUnitLimit(umi, { units: 800_000 }))
-                                .add(
-                                    mintV2(umi, {
-                                        candyMachine: umiCandyMachine.publicKey,
-                                        nftMint,
-                                        collectionMint: umiCandyMachine.collectionMint,
-                                        collectionUpdateAuthority: umiCandyMachine.authority,
-                                    })
-                                )
-                                .sendAndConfirm(umi);
-                        } catch (mintV2Error) {
-                            console.log('⚠️ mintV2 failed:', mintV2Error.message);
-                            console.log('🔄 Falling back to standard mint (no guard required)...');
-                            
-                            // Fallback to standard mint for ANY mintV2 failure
-                            tx = await transactionBuilder()
-                                .add(setComputeUnitLimit(umi, { units: 800_000 }))
-                                .add(
-                                    mint(umi, {
-                                        candyMachine: umiCandyMachine.publicKey,
-                                        nftMint,
-                                        collectionMint: umiCandyMachine.collectionMint,
-                                        collectionUpdateAuthority: umiCandyMachine.authority,
-                                    })
-                                )
-                                .sendAndConfirm(umi);
-                        }
+                // Use ONLY standard mint (no guard required)
+                console.log('🎯 Using standard mint (no guard required)...');
+                const tx = await transactionBuilder()
+                    .add(setComputeUnitLimit(umi, { units: 800_000 }))
+                    .add(
+                        mint(umi, {
+                            candyMachine: umiCandyMachine.publicKey,
+                            nftMint,
+                            collectionMint: umiCandyMachine.collectionMint,
+                            collectionUpdateAuthority: umiCandyMachine.authority,
+                        })
+                    )
+                    .sendAndConfirm(umi);
                 
                 console.log('✅ Umi mint successful!');
                 console.log('📝 Signature:', tx.signature);
