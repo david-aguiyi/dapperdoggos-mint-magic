@@ -101,7 +101,7 @@ app.post("/mint", async (req, res) => {
     
     // Try Metaplex with minimal parameters and better debugging
     try {
-        console.log('🚀 Starting Metaplex mint (CMv3) - MINIMAL DEBUG APPROACH...');
+        console.log('🚀 Starting Metaplex mint (CMv3) - COLLECTION AUTHORITY FIX...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
@@ -136,13 +136,16 @@ app.post("/mint", async (req, res) => {
             });
         }
         
-        // Mint with absolute minimal parameters
+        // Mint with proper parameters
         const receiverPubkey = new PublicKey(wallet);
         console.log('🎯 Minting to wallet:', receiverPubkey.toString());
+        console.log('🔑 Authority (payer):', authorityKeypair.publicKey.toString());
+        console.log('🎨 Collection authority:', candyMachine.authorityAddress.toBase58());
         
-        // Try the most basic mint call possible
+        // Use the authority as both payer and collection authority
         const { nft, response } = await metaplex.candyMachines().mint({
-            candyMachine
+            candyMachine,
+            collectionUpdateAuthority: authorityKeypair.publicKey,
         });
         
         console.log('✅ Mint successful:', {
