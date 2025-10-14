@@ -101,7 +101,7 @@ app.post("/mint", async (req, res) => {
     
     // Use Metaplex SDK for minting with Candy Machine v3 MintV2 instruction
     try {
-        console.log('🚀 Starting Metaplex SDK mint (CMv3 MintV2) - DEPLOYED VERSION...');
+        console.log('🚀 Starting Metaplex SDK mint (CMv3 Standard) - FIXED VERSION...');
         
         // Initialize connection
         const connection = new Connection(RPC, "confirmed");
@@ -127,7 +127,7 @@ app.post("/mint", async (req, res) => {
         // Check if sold out
         if (candyMachine.itemsAvailable.toNumber() < quantity) {
             activeMints.delete(mintKey);
-            return res.status(400).json({
+                return res.status(400).json({ 
                 error: "Not enough NFTs available",
                 message: `Only ${candyMachine.itemsAvailable.toString()} NFT(s) remaining, but you requested ${quantity}`,
                 isSoldOut: candyMachine.itemsAvailable.toNumber() === 0
@@ -141,8 +141,8 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`🎨 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with MintV2 instruction (required for CMv3)
-            const { nft, response } = await metaplex.candyMachines().mintV2({
+            // Mint with standard mint method (works with CMv3)
+            const { nft, response } = await metaplex.candyMachines().mint({
                 candyMachine,
                 owner: receiverPubkey,
                 payer: receiverPubkey,
@@ -169,9 +169,9 @@ app.post("/mint", async (req, res) => {
             console.log('🖼️ Fetching NFT metadata...');
             const mintPubkey = new PublicKey(firstMint.mint);
             const nft = await metaplex.nfts().findByMint({ mintAddress: mintPubkey });
-            
-            if (nft && nft.json && nft.json.image) {
-                image = nft.json.image;
+
+                    if (nft && nft.json && nft.json.image) {
+                        image = nft.json.image;
                 console.log('✅ Image found:', image);
             }
         } catch (imageError) {
@@ -197,7 +197,7 @@ app.post("/mint", async (req, res) => {
     } catch (mintError) {
         console.error('❌ Metaplex mint error:', mintError);
         activeMints.delete(mintKey);
-        
+
         // Handle specific Metaplex errors
         if (mintError.message?.includes('insufficient') || mintError.message?.includes('InsufficientFunds')) {
             return res.status(400).json({
