@@ -11,13 +11,8 @@
 
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { keypairIdentity } from '@metaplex-foundation/umi-signer-keypairs';
-import { 
-  findCandyMachineAuthorityPda,
-  findCandyGuardAuthorityPda,
-  wrapCandyMachine,
-  unwrapCandyMachine
-} from '@metaplex-foundation/mpl-candy-machine';
+// import { keypairIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
+import * as mplCandyMachine from '@metaplex-foundation/mpl-candy-machine';
 import { publicKey as umiPublicKey } from '@metaplex-foundation/umi';
 import fs from 'fs';
 import path from 'path';
@@ -66,11 +61,11 @@ async function fixCandyGuard() {
     console.log('📊 Checking current Candy Machine state...');
     
     // Find the PDAs
-    const [candyMachineAuthorityPda] = findCandyMachineAuthorityPda(umi, {
+    const [candyMachineAuthorityPda] = mplCandyMachine.findCandyMachineAuthorityPda(umi, {
       candyMachine: candyMachineAddress,
     });
     
-    const [candyGuardAuthorityPda] = findCandyGuardAuthorityPda(umi, {
+    const [candyGuardAuthorityPda] = mplCandyMachine.findCandyGuardAuthorityPda(umi, {
       candyGuard: candyGuardAddress,
     });
 
@@ -80,7 +75,7 @@ async function fixCandyGuard() {
     // Wrap the Candy Machine with the Candy Guard
     console.log('🔗 Wrapping Candy Machine with Candy Guard...');
     
-    const wrapTransaction = await wrapCandyMachine(umi, {
+    const wrapTransaction = await mplCandyMachine.wrapCandyMachine(umi, {
       candyMachine: candyMachineAddress,
       candyGuard: candyGuardAddress,
       authority: umi.identity,

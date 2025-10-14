@@ -81,7 +81,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v7 - FIX RATE LIMITING - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v8 - SKIP CANDY GUARD - USE SIMPLE MINT - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -119,24 +119,42 @@ app.post("/mint", async (req, res) => {
             console.log(`\n📦 Minting NFT ${i + 1}/${quantity}...`);
             
             try {
-                // Try using mintV2 if available, otherwise fall back to mint
-                let mintResult;
+                // Use Sugar CLI directly - this should work without Candy Guard issues
+                console.log('🎯 Using Sugar CLI for minting...');
                 
-                if (typeof metaplex.candyMachines().mintV2 === 'function') {
-                    console.log('🎯 Using mintV2 instruction...');
-                    mintResult = await metaplex.candyMachines().mintV2({
-                        candyMachine,
-                        owner: receiverPubkey,
-                        payer: authorityKeypair.publicKey,
-                    });
-                } else {
-                    console.log('🎯 Using standard mint instruction...');
-                    mintResult = await metaplex.candyMachines().mint({
-                        candyMachine,
-                        owner: receiverPubkey,
-                        payer: authorityKeypair.publicKey,
-                    });
+                const { exec } = await import('child_process');
+                const { promisify } = await import('util');
+                const execAsync = promisify(exec);
+                
+                // Use Sugar to mint directly
+                const sugarCommand = `./sugar mint ${CANDY_MACHINE_ID} --keypair ${KEYPAIR} --rpc-url ${RPC} --receiver ${receiverPubkey.toString()}`;
+                console.log('🍬 Running Sugar command:', sugarCommand);
+                
+                const { stdout, stderr } = await execAsync(sugarCommand);
+                
+                console.log('🍬 Sugar output:', { stdout, stderr });
+                
+                if (stderr && !stderr.includes('success')) {
+                    throw new Error(`Sugar mint failed: ${stderr}`);
                 }
+                
+                // Parse the output to get mint address and signature
+                const mintMatch = stdout.match(/Mint address: ([A-Za-z0-9]{32,44})/);
+                const signatureMatch = stdout.match(/Signature: ([A-Za-z0-9]{64,88})/);
+                
+                if (!mintMatch || !signatureMatch) {
+                    throw new Error('Could not parse Sugar output for mint address and signature');
+                }
+                
+                const mintResult = {
+                    nft: {
+                        address: new PublicKey(mintMatch[1]),
+                        name: `DapperDoggo #${i + 1}`
+                    },
+                    response: {
+                        signature: signatureMatch[1]
+                    }
+                };
                 
                 console.log('🔍 Raw mint result:', mintResult);
                 console.log('🔍 Mint result type:', typeof mintResult);
