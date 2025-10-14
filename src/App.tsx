@@ -41,7 +41,7 @@ function App() {
   const fetchCollectionStatus = async () => {
     try {
       // Fetch directly from blockchain using Umi
-      const RPC_URL = 'https://api.mainnet-beta.solana.com';
+      const RPC_URL = 'https://solana-mainnet.rpc.extrnode.com';
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
       const umi = createUmi(RPC_URL);
@@ -120,7 +120,8 @@ function App() {
       }
 
       // Initialize Umi with RPC and wallet
-      const RPC_URL = 'https://api.mainnet-beta.solana.com';
+      // Using public RPC - may be rate limited, consider using paid RPC for production
+      const RPC_URL = 'https://solana-mainnet.rpc.extrnode.com';
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
       const umi = createUmi(RPC_URL)
@@ -145,7 +146,7 @@ function App() {
         setIsMinting(false);
         return;
       }
-
+      
       const mintResults = [];
 
       for (let i = 0; i < mintQuantity; i++) {
@@ -181,14 +182,14 @@ function App() {
       fetchCollectionStatus();
 
       // Show success modal
-      setSuccessData({
+        setSuccessData({
         mint: mintResults[0].mint.toString(),
         signature: Buffer.from(mintResults[0].signature).toString('base64'),
         image: '/nfts/1.png', // Placeholder
-        wallet: walletAddress,
-        quantity: mintQuantity
-      });
-      setShowSuccessModal(true);
+          wallet: walletAddress,
+          quantity: mintQuantity
+        });
+        setShowSuccessModal(true);
 
     } catch (error: any) {
       console.error('❌ Minting error:', error);
@@ -211,7 +212,7 @@ function App() {
     <div className="app">
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       
-
+      
       {/* Connect Wallet Button */}
       <div className="wallet-button-container">
           <button 
