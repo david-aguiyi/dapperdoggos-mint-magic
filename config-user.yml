@@ -1,4 +1,4 @@
-﻿json_rpc_url: https://api.devnet.solana.com
+﻿json_rpc_url: https://api.mainnet-beta.solana.com
 websocket_url: ""
-keypair_path: "C:\Users\Agavid\.config\solana\devnet.json"
+keypair_path: "C:\Users\Agavid\Downloads\dapperdoggos-mint-magic\mainnet.json"
 commitment: confirmed
