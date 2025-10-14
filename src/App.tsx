@@ -3,14 +3,6 @@ import './App.css';
 import DogTicker from './components/DogTicker';
 import { useToast, ToastContainer } from './components/Toast';
 import MintSuccessModal from './components/MintSuccessModal';
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
-import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
-import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
-import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
-
-// Import candy machine program registration
-import * as mplCandyMachineModule from '@metaplex-foundation/mpl-candy-machine';
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -112,104 +104,60 @@ function App() {
     setIsMinting(true);
     
     try {
-      console.log('🚀 Starting frontend minting with Umi...');
+      console.log('🚀 Starting backend minting...');
       
-      // Get wallet provider
-      const provider = (window as any).solana || (window as any).phantom?.solana;
-      if (!provider) {
-        toast.error('Wallet provider not found!');
-        return;
-      }
-
-      // Candy Machine ID
-      const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
-      
-      // Using Helius RPC with your free API key (100k requests/day)
-      const RPC_URL = 'https://rpc.helius.xyz/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20';
-      
-      const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
-      
-      // Register Candy Machine program with Umi
-      const { mplCandyMachine } = mplCandyMachineModule as any;
-      if (typeof mplCandyMachine === 'function') {
-        umi.use(mplCandyMachine());
-        console.log('✅ Candy Machine program registered');
-      }
-      
-      console.log('✅ Umi initialized');
-
-      // Fetch Candy Machine
-      const candyMachineAddress = umiPublicKey(CANDY_MACHINE_ID);
-      const candyMachine = await fetchCandyMachine(umi, candyMachineAddress);
-      
-      console.log('🍬 Candy Machine loaded:', {
-        address: candyMachine.publicKey,
-        itemsRedeemed: candyMachine.itemsRedeemed.toString(),
-        itemsAvailable: candyMachine.data.itemsAvailable.toString(),
+      const response = await fetch(`${API_BASE_URL}/mint`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          wallet: walletAddress,
+          quantity: mintQuantity
+        })
       });
 
-      // Check if sold out
-      const remaining = Number(candyMachine.data.itemsAvailable) - Number(candyMachine.itemsRedeemed);
-      if (remaining < mintQuantity) {
-        toast.error(`Only ${remaining} NFT(s) remaining!`);
-        setIsMinting(false);
-        return;
-      }
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
       
-      const mintResults = [];
+      const result = await response.json();
+      console.log('Mint response:', result);
 
-      for (let i = 0; i < mintQuantity; i++) {
-        console.log(`🎨 Minting NFT ${i + 1}/${mintQuantity}...`);
-
-        // Generate new NFT mint account
-        const nftMint = generateSigner(umi);
-
-        // Build and send mint transaction
-        const tx = await transactionBuilder()
-          .add(setComputeUnitLimit(umi, { units: 800_000 }))
-          .add(
-            mintV2(umi, {
-              candyMachine: candyMachine.publicKey,
-              nftMint,
-              collectionMint: candyMachine.collectionMint,
-              collectionUpdateAuthority: candyMachine.authority,
-            })
-          )
-          .sendAndConfirm(umi);
-
-        console.log(`✅ NFT ${i + 1} minted!`);
-        console.log('Signature:', tx.signature);
-        
-        mintResults.push({
-          mint: nftMint.publicKey,
-          signature: tx.signature,
-        });
+      if (!response.ok) {
+        if (result.isInsufficientFunds) {
+          toast.error(`💰 ${result.message}`, {
+            duration: 8000,
+            action: {
+              label: 'Add SOL',
+              onClick: () => window.open('https://phantom.app/', '_blank')
+            }
+          });
+        } else if (result.isSoldOut) {
+          toast.error(`🚫 ${result.message}`);
+          setIsSoldOut(true);
+        } else {
+          toast.error(`❌ ${result.error}: ${result.message}`);
+        }
+        return;
       }
 
       // Success!
       toast.success(`Successfully minted ${mintQuantity} NFT(s)! Check your wallet.`);
-      fetchCollectionStatus();
+      fetchCollectionStatus(); // Refresh status
 
       // Show success modal
-        setSuccessData({
-        mint: mintResults[0].mint.toString(),
-        signature: Buffer.from(mintResults[0].signature).toString('base64'),
-        image: '/nfts/1.png', // Placeholder
-          wallet: walletAddress,
-          quantity: mintQuantity
-        });
-        setShowSuccessModal(true);
+      setSuccessData({
+        mint: result.mint,
+        signature: result.signature,
+        image: result.image || '/nfts/1.png',
+        wallet: result.wallet,
+        quantity: result.quantity
+      });
+      setShowSuccessModal(true);
 
     } catch (error: any) {
       console.error('❌ Minting error:', error);
-      
-      if (error.message?.includes('User rejected')) {
-        toast.error('Transaction was rejected');
-      } else if (error.message?.includes('insufficient')) {
-        toast.error('Insufficient SOL balance');
-      } else {
-        toast.error(`Mint failed: ${error.message || 'Unknown error'}`);
-      }
+      toast.error(`Error minting NFT: ${error.message || 'Network error'}`);
     } finally {
       setIsMinting(false);
     }
@@ -221,7 +169,7 @@ function App() {
     <div className="app">
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       
-      
+
       {/* Connect Wallet Button */}
       <div className="wallet-button-container">
           <button 
@@ -236,88 +184,68 @@ function App() {
 
       {/* Hero Section */}
       <section className="hero">
-        <div className="hero-content">
-          <div className="minting-banner">
-            <span className="sparkle-static">✨</span>
-            Minting Now Live
+        <div className="container">
+          <div className="hero-content">
+            <h1 className="hero-title">DapperDoggos NFT Mint</h1>
+            <p className="hero-description">
+              Mint your DapperDoggo NFT and join the pack!
+            </p>
+            
+            {/* Minting UI */}
+            <div className="mint-container">
+              <div className="mint-info">
+                <span className="minted-count">{mintedCount}</span> / <span className="total-supply">{totalSupply}</span> Minted
+              </div>
+              <div className="progress-bar-container">
+                <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+              </div>
+              
+              {isSoldOut ? (
+                <p className="sold-out-message">SOLD OUT!</p>
+              ) : (
+                <>
+                  <div className="mint-quantity-selector">
+                    <button 
+                      onClick={() => setMintQuantity(prev => Math.max(1, prev - 1))} 
+                      disabled={mintQuantity <= 1 || isMinting}
+                    >
+                      -
+                    </button>
+                    <span>{mintQuantity}</span>
+                    <button 
+                      onClick={() => setMintQuantity(prev => Math.min(10, prev + 1))} 
+                      disabled={mintQuantity >= 10 || isMinting}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button 
+                    className="mint-button" 
+                    onClick={mintNFT} 
+                    disabled={!isWalletConnected || isMinting || isSoldOut}
+                  >
+                    {isMinting ? 'Minting...' : `Mint ${mintQuantity} for ${(mintQuantity * 0.1).toFixed(1)} SOL`}
+                  </button>
+                  <p className="mint-price-info">
+                    (Plus ~0.011 SOL network fee per NFT)
+                  </p>
+                </>
+              )}
+            </div>
           </div>
-          <h2 className="main-title">
-            MINT YOUR <span className="gradient-text">DAPPERDOGGO</span>
-          </h2>
-          <p className="hero-description">
-            Join the revolution of digital collectibles. Each DapperDoggo is a unique NFT with rare traits and exclusive benefits.
-          </p>
         </div>
       </section>
 
-      {/* NFT Ticker */}
-      <DogTicker />
-
-      {/* Minting Status */}
-      <section className="minting-status">
-        <div className="status-card">
-          <div className="minted-info">
-            <span className="minted-label">Minted</span>
-            <span className="minted-count">{mintedCount}/{totalSupply}</span>
-          </div>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill" 
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          
-          {isSoldOut ? (
-            <button className="sold-out-btn" disabled>
-              <span className="x-icon">✕</span>
-              Sold Out!
-            </button>
-          ) : (
-            <div className="mint-controls">
-              <div className="quantity-controls">
-                <button 
-                  onClick={() => setMintQuantity(Math.max(1, mintQuantity - 1))}
-                  className="quantity-btn"
-                  disabled={isMinting}
-                >
-                  −
-                </button>
-                <span className="quantity">{mintQuantity}</span>
-                <button 
-                  onClick={() => setMintQuantity(Math.min(totalSupply - mintedCount, mintQuantity + 1))}
-                  className="quantity-btn"
-                  disabled={isMinting}
-                >
-                  +
-                </button>
-              </div>
-              <button 
-                className="mint-btn"
-                onClick={mintNFT}
-                disabled={isMinting}
-              >
-                {isMinting ? (
-                  <>
-                    <span className="sparkle-rotating">✨</span>
-                    Minting...
-                  </>
-                ) : (
-                  <>
-                    <span className="sparkle-static">✨</span>
-                    Mint {mintQuantity} for {(mintQuantity * 0.1).toFixed(1)} SOL
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
+      {/* Dog Ticker Section */}
+      <section className="dog-ticker-section">
+        <DogTicker />
       </section>
 
       {/* Mint Success Modal */}
       <MintSuccessModal 
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        mintData={successData}
+        show={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)} 
+        mintData={successData} 
       />
     </div>
   );
