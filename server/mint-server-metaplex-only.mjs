@@ -132,7 +132,8 @@ app.post("/mint", async (req, res) => {
                 // Use Metaplex SDK only (no guards)
                 console.log('🎯 Using Metaplex SDK for minting...');
                 
-                const nft = await candyMachine.mint({
+                const nft = await metaplex.candyMachines().mint({
+                    candyMachine: candyMachine,
                     owner: receiverPubkey,
                     payer: authorityKeypair.publicKey,
                 });
