@@ -27,17 +27,13 @@ function App() {
   const API_BASE_URL = 'https://dapperdoggos-api.onrender.com';
 
   useEffect(() => {
-    console.log('App loaded - UI should be visible');
-    // Try to fetch collection status
     fetchCollectionStatus();
   }, []);
 
   const fetchCollectionStatus = async () => {
     try {
-      console.log('Fetching collection status...');
       const response = await fetch(`${API_BASE_URL}/collection/status`);
       const data = await response.json();
-      console.log('Collection status:', data);
       setMintedCount(data.itemsRedeemed || 4);
       setTotalSupply(250);
       setIsSoldOut(data.isSoldOut || false);
@@ -131,7 +127,6 @@ function App() {
 
   const progress = (mintedCount / totalSupply) * 100;
 
-  console.log('Rendering App with:', { mintedCount, totalSupply, progress, isWalletConnected });
 
   return (
     <div className="app">
