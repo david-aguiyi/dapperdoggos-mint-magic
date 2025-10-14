@@ -41,7 +41,7 @@ function App() {
   const fetchCollectionStatus = async () => {
     try {
       // Fetch directly from blockchain using Umi
-      const RPC_URL = 'https://solana-mainnet.rpc.extrnode.com';
+      const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=';
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
       const umi = createUmi(RPC_URL);
@@ -120,8 +120,8 @@ function App() {
       }
 
       // Initialize Umi with RPC and wallet
-      // Using public RPC - may be rate limited, consider using paid RPC for production
-      const RPC_URL = 'https://solana-mainnet.rpc.extrnode.com';
+      // Using Helius public RPC (works without API key for testing)
+      const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=';
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
       const umi = createUmi(RPC_URL)
