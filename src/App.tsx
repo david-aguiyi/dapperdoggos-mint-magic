@@ -111,9 +111,11 @@ function App() {
       // Candy Machine ID
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
-      // Initialize Umi with standard Solana RPC
-      // Note: May hit rate limits. For production, use a paid RPC or get free Helius API key
+      // IMPORTANT: Public RPC may be rate limited (403 errors)
+      // SOLUTION: Get free Helius API key at https://www.helius.dev/
+      // Then replace with: https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
       const RPC_URL = 'https://api.mainnet-beta.solana.com';
+      
       const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
       
       console.log('✅ Umi initialized');

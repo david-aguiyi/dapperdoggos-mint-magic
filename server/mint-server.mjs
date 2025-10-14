@@ -166,6 +166,21 @@ app.post("/mint", async (req, res) => {
     }
 });
 
+// RPC Proxy endpoint - allows frontend to use backend's RPC
+app.post("/rpc-proxy", async (req, res) => {
+    try {
+        const connection = new Connection(RPC, "confirmed");
+        const { method, params } = req.body;
+        
+        // Proxy the RPC call
+        const result = await connection._rpcRequest(method, params);
+        res.json(result);
+    } catch (error) {
+        console.error('RPC proxy error:', error);
+        res.status(500).json({ error: 'RPC request failed' });
+    }
+});
+
 app.get("/collection/status", async (req, res) => {
     try {
         const connection = new Connection(RPC, "confirmed");
