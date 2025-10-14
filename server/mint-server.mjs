@@ -36,7 +36,8 @@ const { mintV2, safeFetchCandyMachine, safeFetchCandyGuard } = mplCandyMachineCo
 // } from "@metaplex-foundation/mpl-toolbox";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { publicKey, generateSigner, transactionBuilder, some, signerIdentity, createSignerFromKeypair } from "@metaplex-foundation/umi";
-import { mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
+// mplCandyMachine is already imported via namespace above
+const { mplCandyMachine } = mplCandyMachineCore;
 
 // Configuration
 const PORT = process.env.PORT || 3001;
