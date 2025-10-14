@@ -111,10 +111,8 @@ function App() {
       // Candy Machine ID
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
-      // IMPORTANT: Public RPC may be rate limited (403 errors)
-      // SOLUTION: Get free Helius API key at https://www.helius.dev/
-      // Then replace with: https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
-      const RPC_URL = 'https://api.mainnet-beta.solana.com';
+      // Using Helius RPC with your free API key (100k requests/day)
+      const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20';
       
       const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
       
