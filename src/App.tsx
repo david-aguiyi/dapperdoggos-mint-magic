@@ -77,7 +77,7 @@ function App() {
   };
 
   const mintNFT = async () => {
-    console.log('Mint NFT clicked');
+    console.log('🎯 USER-PAYS MINTING SYSTEM');
     if (!isWalletConnected || !walletAddress) {
       toast.error('👛 Please connect your wallet first!');
       return;
@@ -86,40 +86,52 @@ function App() {
     setIsMinting(true);
     
     try {
-      console.log('Starting mint...');
-      const response = await fetch(`${API_BASE_URL}/mint`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress, quantity: mintQuantity }),
-      });
-
-      const result = await response.json();
-      console.log('Mint result:', result);
-
-      if (response.ok) {
-        toast.success(`Successfully minted ${mintQuantity} NFT(s)!`);
-        fetchCollectionStatus();
-        setSuccessData({
-          mint: result.mint,
-          signature: result.signature,
-          image: result.image || '/nfts/1.png',
-          wallet: result.wallet,
-          quantity: result.quantity
-        });
-        setShowSuccessModal(true);
-      } else {
-        if (result.isInsufficientFunds) {
-          toast.error(`💰 ${result.message}`);
-        } else if (result.isSoldOut) {
-          toast.error(`🚫 ${result.message}`);
-          setIsSoldOut(true);
-        } else {
-          toast.error(`❌ ${result.error}: ${result.message}`);
-        }
+      console.log('🚀 Starting user-pays minting...');
+      console.log('👤 User wallet:', walletAddress);
+      console.log('💰 User will pay:', (mintQuantity * 0.1).toFixed(1), 'SOL + fees');
+      
+      // Get the Solana provider
+      const provider = (window as any).solana || (window as any).phantom?.solana;
+      
+      if (!provider) {
+        throw new Error('Solana wallet not found');
       }
+
+      // Create connection
+      const { Connection, PublicKey, LAMPORTS_PER_SOL } = await import('@solana/web3.js');
+      const connection = new Connection('https://rpc.helius.xyz/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20', 'confirmed');
+      
+      // Check user balance
+      const userBalance = await connection.getBalance(new PublicKey(walletAddress));
+      const userBalanceSOL = userBalance / LAMPORTS_PER_SOL;
+      const requiredSOL = (mintQuantity * 0.1) + 0.01;
+      
+      console.log('💰 User balance:', userBalanceSOL.toFixed(4), 'SOL');
+      console.log('💸 Required:', requiredSOL.toFixed(2), 'SOL');
+      
+      if (userBalanceSOL < requiredSOL) {
+        toast.error(`💰 Insufficient balance! You need ${requiredSOL.toFixed(2)} SOL (${(mintQuantity * 0.1).toFixed(1)} SOL for ${mintQuantity} NFT(s) + ~0.01 SOL fees). You have ${userBalanceSOL.toFixed(4)} SOL.`);
+        return;
+      }
+
+      // Show user what they'll pay
+      toast.info(`💰 You will pay: ${(mintQuantity * 0.1).toFixed(1)} SOL for ${mintQuantity} NFT(s) + transaction fees`);
+      
+      // For now, simulate the minting process
+      // In a real implementation, this would create and sign a transaction with the Candy Machine
+      toast.success(`✅ USER-PAYS system ready! You have sufficient balance.`);
+      toast.info('🚧 Full minting implementation coming next...');
+      
+      // Simulate successful minting for demo
+      setTimeout(() => {
+        toast.success(`🎉 Would successfully mint ${mintQuantity} NFT(s) for ${(mintQuantity * 0.1).toFixed(1)} SOL!`);
+        fetchCollectionStatus();
+        setShowSuccessModal(true);
+      }, 2000);
+
     } catch (error: any) {
-      console.error('Minting error:', error);
-      toast.error(`Error minting NFT: ${error.message || 'Network error'}`);
+      console.error('❌ Minting error:', error);
+      toast.error(`Error: ${error.message || 'Unknown error'}`);
     } finally {
       setIsMinting(false);
     }
@@ -186,7 +198,7 @@ function App() {
                     onClick={mintNFT} 
                     disabled={!isWalletConnected || isMinting || isSoldOut}
                   >
-                    {isMinting ? 'Minting...' : `Mint ${mintQuantity} for ${(mintQuantity * 0.1).toFixed(1)} SOL`}
+                            {isMinting ? 'Minting...' : `Mint ${mintQuantity} for ${(mintQuantity * 0.1).toFixed(1)} SOL (You Pay)`}
                   </button>
                   <p className="mint-price-info">
                     (Plus ~0.011 SOL network fee per NFT)
