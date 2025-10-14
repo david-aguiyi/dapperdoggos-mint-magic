@@ -75,7 +75,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v4 - UNDEFINED ERROR FIXED - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v6 - TRY MINTV2 + EXPLICIT PAYER - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -113,32 +113,65 @@ app.post("/mint", async (req, res) => {
             console.log(`\n📦 Minting NFT ${i + 1}/${quantity}...`);
             
             try {
-                // Mint with simple parameters
-                const { nft, response } = await metaplex.candyMachines().mint({
-                    candyMachine,
-                    owner: receiverPubkey,
-                });
+                // Try using mintV2 if available, otherwise fall back to mint
+                let mintResult;
                 
-                console.log('🔍 Mint result:', { nft, response });
-                
-                // Validate the response
-                if (!nft || !nft.address) {
-                    throw new Error('NFT object is missing address');
+                if (typeof metaplex.candyMachines().mintV2 === 'function') {
+                    console.log('🎯 Using mintV2 instruction...');
+                    mintResult = await metaplex.candyMachines().mintV2({
+                        candyMachine,
+                        owner: receiverPubkey,
+                        payer: authorityKeypair.publicKey,
+                    });
+                } else {
+                    console.log('🎯 Using standard mint instruction...');
+                    mintResult = await metaplex.candyMachines().mint({
+                        candyMachine,
+                        owner: receiverPubkey,
+                        payer: authorityKeypair.publicKey,
+                    });
                 }
-                if (!response || !response.signature) {
-                    throw new Error('Response object is missing signature');
+                
+                console.log('🔍 Raw mint result:', mintResult);
+                console.log('🔍 Mint result type:', typeof mintResult);
+                console.log('🔍 Mint result keys:', Object.keys(mintResult || {}));
+                
+                // Safely extract nft and response
+                const nft = mintResult?.nft;
+                const response = mintResult?.response;
+                
+                console.log('🔍 NFT object:', nft);
+                console.log('🔍 Response object:', response);
+                
+                // Validate the response with detailed error messages
+                if (!nft) {
+                    throw new Error('Mint result does not contain NFT object');
+                }
+                if (!nft.address) {
+                    throw new Error('NFT object does not contain address property');
+                }
+                if (!response) {
+                    throw new Error('Mint result does not contain response object');
+                }
+                if (!response.signature) {
+                    throw new Error('Response object does not contain signature property');
                 }
                 
-                console.log(`✅ Minted: ${nft.address.toString()}`);
-                console.log(`📝 Signature: ${response.signature}`);
+                // Safely convert to strings
+                const mintAddress = nft.address?.toString ? nft.address.toString() : String(nft.address);
+                const signature = response.signature?.toString ? response.signature.toString() : String(response.signature);
+                
+                console.log(`✅ Minted: ${mintAddress}`);
+                console.log(`📝 Signature: ${signature}`);
                 
                 mintResults.push({
-                    mint: nft.address.toString(),
-                    signature: response.signature,
+                    mint: mintAddress,
+                    signature: signature,
                     name: nft.name || `DapperDoggo #${i + 1}`,
                 });
             } catch (mintError) {
                 console.error(`❌ Failed to mint NFT ${i + 1}:`, mintError);
+                console.error(`❌ Error stack:`, mintError.stack);
                 activeMints.delete(mintKey);
                 return res.status(500).json({
                     error: 'Mint Failed',
