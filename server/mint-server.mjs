@@ -87,7 +87,18 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v14 - UNIVERSAL MINT FALLBACK - ' + new Date().toISOString());
+        
+        // Check authority wallet balance
+        const authorityBalance = await connection.getBalance(authorityKeypair.publicKey);
+        const authorityBalanceSOL = authorityBalance / 1e9;
+        console.log('💰 Authority balance:', authorityBalanceSOL.toFixed(4), 'SOL');
+        
+        if (authorityBalanceSOL < 0.01) {
+            console.log('⚠️ WARNING: Authority wallet has low balance for transaction fees');
+            console.log('💡 Consider adding more SOL to the authority wallet');
+        }
+        
+        console.log('🚀 FORCE DEPLOY v15 - BALANCE CHECK & ERROR HANDLING - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -247,16 +258,29 @@ app.post("/mint", async (req, res) => {
                     signature: signature,
                     name: nft.name || `DapperDoggo #${i + 1}`,
                 });
-            } catch (mintError) {
-                console.error(`❌ Failed to mint NFT ${i + 1}:`, mintError);
-                console.error(`❌ Error stack:`, mintError.stack);
-                activeMints.delete(mintKey);
-                return res.status(500).json({
-                    error: 'Mint Failed',
-                    message: `Failed to mint NFT ${i + 1}: ${mintError.message}`,
-                    details: mintError.toString()
-                });
-            }
+                    } catch (mintError) {
+                        console.error(`❌ Failed to mint NFT ${i + 1}:`, mintError);
+                        console.error(`❌ Error stack:`, mintError.stack);
+                        activeMints.delete(mintKey);
+                        
+                        // Check for insufficient funds error
+                        if (mintError.message?.includes('Insufficient funds')) {
+                            return res.status(400).json({
+                                error: 'Insufficient Funds',
+                                message: 'Authority wallet needs more SOL for transaction fees. Please add ~0.01 SOL to the authority wallet.',
+                                isInsufficientFunds: true,
+                                authorityWallet: authorityKeypair.publicKey.toString(),
+                                requiredAmount: '0.01',
+                                details: 'The backend authority wallet needs more SOL to pay for transaction fees.'
+                            });
+                        }
+                        
+                        return res.status(500).json({
+                            error: 'Mint Failed',
+                            message: `Failed to mint NFT ${i + 1}: ${mintError.message}`,
+                            details: mintError.toString()
+                        });
+                    }
         }
 
         // Get metadata
