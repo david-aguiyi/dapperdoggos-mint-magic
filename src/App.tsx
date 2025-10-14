@@ -40,29 +40,18 @@ function App() {
 
   const fetchCollectionStatus = async () => {
     try {
-      // Fetch directly from blockchain using Umi
-      const RPC_URL = 'https://rpc.ankr.com/solana';
-      const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
-      
-      const umi = createUmi(RPC_URL);
-      const candyMachineAddress = umiPublicKey(CANDY_MACHINE_ID);
-      const candyMachine = await fetchCandyMachine(umi, candyMachineAddress);
-      
-      setMintedCount(Number(candyMachine.itemsRedeemed));
-      setTotalSupply(Number(candyMachine.data.itemsAvailable));
-      setIsSoldOut(Number(candyMachine.itemsRedeemed) >= Number(candyMachine.data.itemsAvailable));
+      // Use backend for collection status (saves RPC calls)
+      const response = await fetch(`${API_BASE_URL}/collection/status`);
+      const data = await response.json();
+      setMintedCount(data.itemsRedeemed);
+      setTotalSupply(250);
+      setIsSoldOut(data.isSoldOut);
     } catch (error) {
       console.error('Error fetching collection status:', error);
-      // Fallback to backend if frontend fetch fails
-      try {
-        const response = await fetch(`${API_BASE_URL}/collection/status`);
-        const data = await response.json();
-        setMintedCount(data.itemsRedeemed);
-        setTotalSupply(250);
-        setIsSoldOut(data.isSoldOut);
-      } catch (backendError) {
-        console.error('Backend status also failed:', backendError);
-      }
+      // Set defaults if backend fails
+      setMintedCount(4);
+      setTotalSupply(250);
+      setIsSoldOut(false);
     }
   };
 
@@ -119,13 +108,13 @@ function App() {
         return;
       }
 
-      // Initialize Umi with RPC and wallet
-      // Using Ankr public RPC (truly free, no API key required)
-      const RPC_URL = 'https://rpc.ankr.com/solana';
+      // Candy Machine ID
       const CANDY_MACHINE_ID = '4b7xP29PX6CvwQV6x37GABKRiDE7kMx8Jht7hwuX7WBt';
       
-      const umi = createUmi(RPC_URL)
-        .use(walletAdapterIdentity(provider));
+      // Initialize Umi with standard Solana RPC
+      // Note: May hit rate limits. For production, use a paid RPC or get free Helius API key
+      const RPC_URL = 'https://api.mainnet-beta.solana.com';
+      const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
       
       console.log('✅ Umi initialized');
 
