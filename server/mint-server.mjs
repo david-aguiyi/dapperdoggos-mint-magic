@@ -42,11 +42,11 @@ const activeMints = new Map();
 
 app.post("/mint", async (req, res) => {
     const { wallet, quantity = 1 } = req.body;
-
+    
     if (!wallet) {
         return res.status(400).json({ error: "Wallet address is required" });
     }
-
+    
     if (quantity < 1 || quantity > 5) {
         return res.status(400).json({ 
             error: "Invalid Quantity",
@@ -75,6 +75,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
+        console.log('🚀 FIXED UNDEFINED ERROR - DEPLOY v3...');
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -111,20 +112,40 @@ app.post("/mint", async (req, res) => {
         for (let i = 0; i < quantity; i++) {
             console.log(`\n📦 Minting NFT ${i + 1}/${quantity}...`);
             
-            // Mint with simple parameters
-            const { nft, response } = await metaplex.candyMachines().mint({
-                candyMachine,
-                owner: receiverPubkey,
-            });
-            
-            console.log(`✅ Minted: ${nft.address.toString()}`);
-            console.log(`📝 Signature: ${response.signature}`);
-            
-            mintResults.push({
-                mint: nft.address.toString(),
-                signature: response.signature,
-                name: nft.name,
-            });
+            try {
+                // Mint with simple parameters
+                const { nft, response } = await metaplex.candyMachines().mint({
+                    candyMachine,
+                    owner: receiverPubkey,
+                });
+                
+                console.log('🔍 Mint result:', { nft, response });
+                
+                // Validate the response
+                if (!nft || !nft.address) {
+                    throw new Error('NFT object is missing address');
+                }
+                if (!response || !response.signature) {
+                    throw new Error('Response object is missing signature');
+                }
+                
+                console.log(`✅ Minted: ${nft.address.toString()}`);
+                console.log(`📝 Signature: ${response.signature}`);
+                
+                mintResults.push({
+                    mint: nft.address.toString(),
+                    signature: response.signature,
+                    name: nft.name || `DapperDoggo #${i + 1}`,
+                });
+            } catch (mintError) {
+                console.error(`❌ Failed to mint NFT ${i + 1}:`, mintError);
+                activeMints.delete(mintKey);
+                return res.status(500).json({
+                    error: 'Mint Failed',
+                    message: `Failed to mint NFT ${i + 1}: ${mintError.message}`,
+                    details: mintError.toString()
+                });
+            }
         }
 
         // Get metadata
@@ -143,7 +164,7 @@ app.post("/mint", async (req, res) => {
         console.log('\n✅ MINT SUCCESSFUL!');
         
         res.status(200).json({
-            success: true,
+                success: true, 
             message: `Successfully minted ${quantity} NFT(s)!`,
             mint: mintResults[0].mint,
             signature: mintResults[0].signature,
@@ -158,13 +179,13 @@ app.post("/mint", async (req, res) => {
         
         activeMints.delete(wallet);
         
-        res.status(500).json({
+            res.status(500).json({ 
             error: 'Mint Failed',
             message: error.message,
             details: error.toString()
-        });
-    }
-});
+            });
+        }
+    });
 
 // RPC Proxy endpoint - allows frontend to use backend's RPC
 app.post("/rpc-proxy", async (req, res) => {

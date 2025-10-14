@@ -55,3 +55,64 @@ npm run dev
 ---
 
 If you'd like, I can run a UI mint from the frontend and commit this README change for you.
+
+
+```powershell
+
+.\sugar-windows-latest.exe mint --keypair C:\Users\Agavid\.config\solana\devnet.json --rpc-url https://api.devnet.solana.com
+
+```
+
+
+
+Run the frontend (Vite):
+
+
+
+```powershell
+
+# Ensure .env contains VITE_CANDY_MACHINE_ID, VITE_RPC_URL, VITE_WALLET_KEYPAIR
+
+npm install
+
+npm run dev
+
+# Open http://localhost:8080/
+
+```
+
+
+
+## Notes & troubleshooting
+
+
+
+-   Metadata files must be UTF-8 without BOM.
+
+-   `config.json` holds creators, seller fee, uploadMethod (bundlr), and guard config.
+
+-   If you see `DuplicateCreatorAddress` during mint, check `config.json` for duplicate creators and update on-chain via `sugar config update`.
+
+
+
+## Where things live
+
+
+
+-   Assets and metadata: `assets/`
+
+-   Candy Machine config: `config.json`
+
+-   Upload cache: `cache.json`
+
+-   Scripts for convenience: `scripts/` (includes `mint-collection-from-cache.mjs` used during setup)
+
+
+
+---
+
+
+
+If you'd like, I can run a UI mint from the frontend and commit this README change for you.
+
+
