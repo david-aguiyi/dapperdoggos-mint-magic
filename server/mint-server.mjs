@@ -75,7 +75,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FIXED UNDEFINED ERROR - DEPLOY v3...');
+        console.log('🚀 FORCE DEPLOY v4 - UNDEFINED ERROR FIXED - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
