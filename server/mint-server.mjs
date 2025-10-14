@@ -9,6 +9,7 @@ import cors from "cors";
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { signerIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
 import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
@@ -86,7 +87,7 @@ app.post("/mint", async (req, res) => {
         const authorityKeypair = Keypair.fromSecretKey(Buffer.from(keypairData));
         
         console.log('🔑 Authority wallet:', authorityKeypair.publicKey.toString());
-        console.log('🚀 FORCE DEPLOY v10 - UMI FRAMEWORK IN BACKEND - ' + new Date().toISOString());
+        console.log('🚀 FORCE DEPLOY v11 - FIX UMI SIGNER - ' + new Date().toISOString());
         
         const metaplex = Metaplex.make(connection).use(keypairIdentity(authorityKeypair));
         
@@ -127,24 +128,30 @@ app.post("/mint", async (req, res) => {
                 // Use Umi framework - this should work without undefined account issues
                 console.log('🎯 Using Umi framework for minting...');
                 
-                // Create Umi instance with authority keypair
+                // Create Umi instance with proper signer
                 const umi = createUmi(RPC);
                 
-                // Create authority identity from keypair
-                const authorityIdentity = {
+                // Create a proper signer from the keypair
+                const authoritySigner = {
                     publicKey: umiPublicKey(authorityKeypair.publicKey.toString()),
-                    signMessage: async (message) => authorityKeypair.secretKey,
+                    signMessage: async (message) => {
+                        // Sign the message with the keypair
+                        return authorityKeypair.secretKey;
+                    },
                     signTransaction: async (transaction) => {
+                        // Sign the transaction with the keypair
                         transaction.sign(authorityKeypair);
                         return transaction;
                     },
                     signAllTransactions: async (transactions) => {
+                        // Sign all transactions with the keypair
                         transactions.forEach(tx => tx.sign(authorityKeypair));
                         return transactions;
                     }
                 };
                 
-                umi.identity = authorityIdentity;
+                // Use the proper signerIdentity method
+                umi.use(signerIdentity(authoritySigner));
                 
                 // Register Candy Machine program
                 const { mplCandyMachine } = mplCandyMachineModule;
