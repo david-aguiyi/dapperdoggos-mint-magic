@@ -5,9 +5,12 @@ import { useToast, ToastContainer } from './components/Toast';
 import MintSuccessModal from './components/MintSuccessModal';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
-import { mplCandyMachine, fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
+import { fetchCandyMachine, mintV2 } from '@metaplex-foundation/mpl-candy-machine';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
 import { transactionBuilder, publicKey as umiPublicKey, generateSigner } from '@metaplex-foundation/umi';
+
+// Import candy machine program registration
+import * as mplCandyMachineModule from '@metaplex-foundation/mpl-candy-machine';
 
 function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -60,8 +63,17 @@ function App() {
     
     setIsConnecting(true);
     try {
-      // Simple wallet connection - just like before
+      // Wait a moment for wallet to inject (if needed)
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Check for Solana wallet provider
       const provider = (window as any).solana || (window as any).phantom?.solana;
+      
+      console.log('Checking for wallet...', { 
+        hasSolana: !!(window as any).solana,
+        hasPhantom: !!(window as any).phantom,
+        provider: provider 
+      });
       
       if (provider && provider.connect) {
         console.log('Wallet provider found:', provider);
@@ -71,6 +83,7 @@ function App() {
         setIsWalletConnected(true);
         toast.success('Wallet connected successfully!');
       } else {
+        console.log('No wallet detected - opening Phantom download page');
         toast.error('Solana wallet not found! Please install Phantom or another Solana wallet.');
         window.open('https://phantom.app/', '_blank');
       }
@@ -115,6 +128,13 @@ function App() {
       const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=d4623b1b-e39d-4de0-89cd-3316afb58d20';
       
       const umi = createUmi(RPC_URL).use(walletAdapterIdentity(provider));
+      
+      // Register Candy Machine program with Umi
+      const { mplCandyMachine } = mplCandyMachineModule as any;
+      if (typeof mplCandyMachine === 'function') {
+        umi.use(mplCandyMachine());
+        console.log('✅ Candy Machine program registered');
+      }
       
       console.log('✅ Umi initialized');
 
